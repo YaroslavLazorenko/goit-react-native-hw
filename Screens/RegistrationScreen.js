@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,13 +15,59 @@ import {
 
 import AddPhotoSVG from './components/AddPhotoSVG';
 
-export default function RegistrationScreen() {
-  const keyboardHide = () => {
+const INITIAL_STATE = {
+  name: '',
+  email: '',
+  password: '',
+  showPassword: false,
+  isKeyboardHide: true,
+};
+
+export default function RegistrationScreen({ showScreen }) {
+  const [name, setName] = useState(INITIAL_STATE.name);
+  const [email, setEmail] = useState(INITIAL_STATE.email);
+  const [password, setPassword] = useState(INITIAL_STATE.password);
+  const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
+  const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
+
+  const hideKeyboard = () => {
+    setIsKeyboardHide(true);
     Keyboard.dismiss();
   };
 
+  const nameHandler = text => {
+    setName(text);
+  };
+
+  const emailHandler = text => {
+    setEmail(text);
+  };
+
+  const passwordHandler = text => {
+    setPassword(text);
+  };
+
+  const showPasswordHandler = () => {
+    const toggle = showPassword ? false : true;
+    setShowPassword(toggle);
+  };
+
+  const resetForm = () => {
+    setName(INITIAL_STATE.name);
+    setEmail(INITIAL_STATE.email);
+    setPassword(INITIAL_STATE.password);
+  };
+
+  const onSignup = () => {
+    console.log('name: ', name);
+    console.log('email: ', email);
+    console.log('password: ', password);
+    hideKeyboard();
+    resetForm();
+  };
+
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
+    <TouchableWithoutFeedback onPress={hideKeyboard}>
       <View style={styles.container}>
         <ImageBackground
           style={styles.backgroundImage}
@@ -34,28 +81,50 @@ export default function RegistrationScreen() {
                   source={require('../assets/images/user-photo.jpg')}
                 /> */}
                 <AddPhotoSVG />
-                <Image style={styles.addPhoto} source={require('../assets/images/add-photo.svg')} />
               </View>
               <Text>Реєстрація</Text>
-              <TextInput placeholder={"Ім'я"} textAlign={'left'} style={styles.input} />
+              <TextInput
+                placeholder={"Ім'я"}
+                textAlign={'left'}
+                style={styles.input}
+                value={name}
+                onChangeText={nameHandler}
+                onFocus={() => setIsKeyboardHide(false)}
+              />
               <TextInput
                 placeholder={'Адреса електронної пошти'}
                 textAlign={'left'}
                 style={styles.input}
+                value={email}
+                onChangeText={emailHandler}
+                onFocus={() => setIsKeyboardHide(false)}
               />
               <View>
                 <TextInput
                   placeholder={'Пароль'}
                   textAlign={'left'}
-                  secureTextEntry={true}
+                  secureTextEntry={!showPassword}
                   style={styles.input}
+                  value={password}
+                  onChangeText={passwordHandler}
+                  onFocus={() => setIsKeyboardHide(false)}
                 />
-                <Text>Показати</Text>
+                <Text onPress={showPasswordHandler}>{showPassword ? 'Сховати' : 'Показати'}</Text>
               </View>
-              <TouchableOpacity activeOpacity={0.8} style={styles.button}>
-                <Text style={styles.buttonTitle}>Зареєструватись</Text>
-              </TouchableOpacity>
-              <Text>Вже є акаунт? Увійти</Text>
+              {isKeyboardHide ? (
+                <>
+                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onSignup}>
+                    <Text style={styles.buttonTitle}>Зареєструватись</Text>
+                  </TouchableOpacity>
+                  <Text
+                    onPress={() => {
+                      showScreen('Login');
+                    }}
+                  >
+                    Вже є акаунт? Увійти
+                  </Text>
+                </>
+              ) : null}
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
@@ -70,6 +139,7 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
+    justifyContent: 'flex-end',
     resizeMode: 'cover',
     alignItems: 'center',
   },
@@ -86,11 +156,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#f6f6f6',
   },
-  formContainer: {
-    flex: 1,
-  },
-  userPhoto: {},
-  addPhoto: { width: 25, height: 25, color: '#f00' },
+  // userPhoto: {},
   input: {
     backgroundColor: '#e8e8e8',
   },

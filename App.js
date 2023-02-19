@@ -5,37 +5,12 @@ import LoginScreen from './Screens/LoginScreen';
 import RegistrationScreen from './Screens/RegistrationScreen';
 
 export default function App() {
-  const [screen, setScreen] = useState('');
+  const [screen, setScreen] = useState('Registration');
 
   return (
     <>
-      {screen === 'Registration' && <RegistrationScreen />}
-      {screen === 'Login' && <LoginScreen />}
-      {screen === '' && (
-        <View style={styles.container}>
-          <Button
-            onPress={() => {
-              setScreen('Registration');
-            }}
-            title="Registration screen"
-          />
-          <Button
-            onPress={() => {
-              setScreen('Login');
-            }}
-            title="Login screen"
-          />
-        </View>
-      )}
+      {screen === 'Registration' && <RegistrationScreen showScreen={setScreen} />}
+      {screen === 'Login' && <LoginScreen showScreen={setScreen} />}
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
