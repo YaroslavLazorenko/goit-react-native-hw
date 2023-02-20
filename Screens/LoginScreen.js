@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   ImageBackground,
   Platform,
-  Image,
+  Dimensions,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
@@ -25,6 +25,7 @@ export default function LoginScreen({ showScreen }) {
   const [password, setPassword] = useState(INITIAL_STATE.password);
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
   const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
+  const [focusedInput, setFocusedInput] = useState(null);
 
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
@@ -47,9 +48,10 @@ export default function LoginScreen({ showScreen }) {
   const resetForm = () => {
     setEmail(INITIAL_STATE.email);
     setPassword(INITIAL_STATE.password);
+    setShowPassword(INITIAL_STATE.showPassword);
   };
 
-  const onSignup = () => {
+  const onLogin = () => {
     console.log('email: ', email);
     console.log('password: ', password);
     hideKeyboard();
@@ -58,40 +60,71 @@ export default function LoginScreen({ showScreen }) {
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
-      <View style={styles.container}>
+      <View style={styles.bgContainer}>
         <ImageBackground
           style={styles.backgroundImage}
           source={require('../assets/images/background-image.jpg')}
         >
-          <KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
-            <View style={styles.formContainer}>
-              <Text>Увійти</Text>
+          <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+          >
+            <View
+              style={{
+                ...styles.formContainer,
+                width: Dimensions.get('window').width,
+                paddingBottom: isKeyboardHide ? 144 : 32,
+              }}
+            >
+              <Text style={styles.header}>Увійти</Text>
               <TextInput
                 placeholder={'Адреса електронної пошти'}
+                placeholderTextColor="#bdbdbd"
                 textAlign={'left'}
-                style={styles.input}
+                onSubmitEditing={onLogin}
+                style={{
+                  ...styles.input,
+                  borderColor: focusedInput === 'email' ? '#ff6c00' : '#e8e8e8',
+                }}
                 value={email}
                 onChangeText={emailHandler}
-                onFocus={() => setIsKeyboardHide(false)}
+                onFocus={() => {
+                  setIsKeyboardHide(false);
+                  setFocusedInput('email');
+                }}
+                onBlur={() => setFocusedInput(null)}
               />
               <View>
                 <TextInput
                   placeholder={'Пароль'}
+                  placeholderTextColor="#bdbdbd"
                   textAlign={'left'}
+                  onSubmitEditing={onLogin}
                   secureTextEntry={!showPassword}
-                  style={styles.input}
+                  style={{
+                    ...styles.input,
+                    marginTop: 16,
+                    borderColor: focusedInput === 'password' ? '#ff6c00' : '#e8e8e8',
+                  }}
                   value={password}
                   onChangeText={passwordHandler}
-                  onFocus={() => setIsKeyboardHide(false)}
+                  onFocus={() => {
+                    setIsKeyboardHide(false);
+                    setFocusedInput('password');
+                  }}
+                  onBlur={() => setFocusedInput(null)}
                 />
-                <Text onPress={showPasswordHandler}>{showPassword ? 'Сховати' : 'Показати'}</Text>
+                <Text style={styles.showPasswordLabel} onPress={showPasswordHandler}>
+                  {showPassword ? 'Сховати' : 'Показати'}
+                </Text>
               </View>
               {isKeyboardHide ? (
                 <>
-                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onSignup}>
+                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onLogin}>
                     <Text style={styles.buttonTitle}>Увійти</Text>
                   </TouchableOpacity>
                   <Text
+                    style={styles.registerLink}
                     onPress={() => {
                       showScreen('Registration');
                     }}
@@ -109,29 +142,79 @@ export default function LoginScreen({ showScreen }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  bgContainer: {
     flex: 1,
   },
   backgroundImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    resizeMode: 'stretch',
     flex: 1,
+    justifyContent: 'flex-end',
     resizeMode: 'cover',
     alignItems: 'center',
   },
-  formContainer: {
+  container: {
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  formContainer: {
+    paddingTop: 32,
+    justifyContent: 'flex-start',
     backgroundColor: '#fff',
-    marginTop: 100,
-    width: 100,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+  },
+  header: {
+    marginBottom: 32,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 30,
+    fontWeight: '500',
+    textAlign: 'center',
+    color: '#212121',
   },
   input: {
-    backgroundColor: '#e8e8e8',
+    height: 50,
+    marginHorizontal: 16,
+    paddingHorizontal: 16,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#212121',
+    backgroundColor: '#f6f6f6',
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  showPasswordLabel: {
+    position: 'absolute',
+    top: 30,
+    right: 32,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#1B4371',
   },
   button: {
     height: 51,
+    marginHorizontal: 16,
+    marginTop: 43,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#ff6c00',
+    borderRadius: 100,
   },
   buttonTitle: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    fontWeight: '400',
     color: '#fff',
+  },
+  registerLink: {
+    marginTop: 16,
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#1B4371',
   },
 });
