@@ -101,6 +101,7 @@ export default function RegistrationScreen({ showScreen }) {
                 placeholder={"Ім'я"}
                 placeholderTextColor="#bdbdbd"
                 textAlign={'left'}
+                maxLength={40}
                 onSubmitEditing={onSignup}
                 style={{
                   ...styles.input,
@@ -118,6 +119,8 @@ export default function RegistrationScreen({ showScreen }) {
                 placeholder={'Адреса електронної пошти'}
                 placeholderTextColor="#bdbdbd"
                 textAlign={'left'}
+                keyboardType={'email-address'}
+                maxLength={50}
                 onSubmitEditing={onSignup}
                 style={{
                   ...styles.input,
@@ -137,6 +140,7 @@ export default function RegistrationScreen({ showScreen }) {
                   placeholder={'Пароль'}
                   placeholderTextColor="#bdbdbd"
                   textAlign={'left'}
+                  maxLength={30}
                   onSubmitEditing={onSignup}
                   secureTextEntry={!showPassword}
                   style={{

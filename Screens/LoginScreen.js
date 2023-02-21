@@ -81,6 +81,8 @@ export default function LoginScreen({ showScreen }) {
                 placeholder={'Адреса електронної пошти'}
                 placeholderTextColor="#bdbdbd"
                 textAlign={'left'}
+                keyboardType={'email-address'}
+                maxLength={50}
                 onSubmitEditing={onLogin}
                 style={{
                   ...styles.input,
@@ -99,6 +101,7 @@ export default function LoginScreen({ showScreen }) {
                   placeholder={'Пароль'}
                   placeholderTextColor="#bdbdbd"
                   textAlign={'left'}
+                  maxLength={30}
                   onSubmitEditing={onLogin}
                   secureTextEntry={!showPassword}
                   style={{
