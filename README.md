@@ -1,2 +1,2 @@
-# goit-react-native-hw2
-GoIT React Native Homework #2
+# goit-react-native-hw
+GoIT React Native Homework
