@@ -8,24 +8,19 @@ import {
   TouchableWithoutFeedback,
   ImageBackground,
   Platform,
-  // Image,
+  Dimensions,
   TextInput,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 
-import AddPhotoImage from '../assets/images/add-photo.svg';
-
 const INITIAL_STATE = {
-  name: '',
   email: '',
   password: '',
   showPassword: false,
   isKeyboardHide: true,
 };
 
-export default function RegistrationScreen({ showScreen }) {
-  const [name, setName] = useState(INITIAL_STATE.name);
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState(INITIAL_STATE.email);
   const [password, setPassword] = useState(INITIAL_STATE.password);
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
@@ -35,10 +30,6 @@ export default function RegistrationScreen({ showScreen }) {
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
     Keyboard.dismiss();
-  };
-
-  const nameHandler = text => {
-    setName(text);
   };
 
   const emailHandler = text => {
@@ -55,18 +46,18 @@ export default function RegistrationScreen({ showScreen }) {
   };
 
   const resetForm = () => {
-    setName(INITIAL_STATE.name);
     setEmail(INITIAL_STATE.email);
     setPassword(INITIAL_STATE.password);
     setShowPassword(INITIAL_STATE.showPassword);
   };
 
-  const onSignup = () => {
-    console.log('name: ', name);
+  const onLogin = () => {
+    console.log('Login credentials:');
     console.log('email: ', email);
     console.log('password: ', password);
     hideKeyboard();
     resetForm();
+    navigation.navigate('Home');
   };
 
   return (
@@ -74,7 +65,7 @@ export default function RegistrationScreen({ showScreen }) {
       <View style={styles.bgContainer}>
         <ImageBackground
           style={styles.backgroundImage}
-          source={require('../assets/images/background-image.jpg')}
+          source={require('../../assets/images/background-image.jpg')}
         >
           <KeyboardAvoidingView
             style={styles.container}
@@ -84,47 +75,19 @@ export default function RegistrationScreen({ showScreen }) {
               style={{
                 ...styles.formContainer,
                 width: Dimensions.get('window').width,
-                paddingBottom: isKeyboardHide ? 78 : 32,
+                paddingBottom: isKeyboardHide ? 144 : 32,
               }}
             >
-              <View style={styles.photoContainer}>
-                {/* <Image
-                  style={styles.userPhoto}
-                  source={require('../assets/images/user-photo.jpg')}
-                /> */}
-                <View style={styles.photoButtonContainer}>
-                  <AddPhotoImage width={25} height={25} />
-                </View>
-              </View>
-              <Text style={styles.header}>Реєстрація</Text>
-              <TextInput
-                placeholder={"Ім'я"}
-                placeholderTextColor="#bdbdbd"
-                textAlign={'left'}
-                maxLength={40}
-                onSubmitEditing={onSignup}
-                style={{
-                  ...styles.input,
-                  borderColor: focusedInput === 'name' ? '#ff6c00' : '#e8e8e8',
-                }}
-                value={name}
-                onChangeText={nameHandler}
-                onFocus={() => {
-                  setIsKeyboardHide(false);
-                  setFocusedInput('name');
-                }}
-                onBlur={() => setFocusedInput(null)}
-              />
+              <Text style={styles.header}>Увійти</Text>
               <TextInput
                 placeholder={'Адреса електронної пошти'}
                 placeholderTextColor="#bdbdbd"
                 textAlign={'left'}
                 keyboardType={'email-address'}
                 maxLength={50}
-                onSubmitEditing={onSignup}
+                onSubmitEditing={onLogin}
                 style={{
                   ...styles.input,
-                  marginTop: 16,
                   borderColor: focusedInput === 'email' ? '#ff6c00' : '#e8e8e8',
                 }}
                 value={email}
@@ -141,7 +104,7 @@ export default function RegistrationScreen({ showScreen }) {
                   placeholderTextColor="#bdbdbd"
                   textAlign={'left'}
                   maxLength={30}
-                  onSubmitEditing={onSignup}
+                  onSubmitEditing={onLogin}
                   secureTextEntry={!showPassword}
                   style={{
                     ...styles.input,
@@ -162,17 +125,16 @@ export default function RegistrationScreen({ showScreen }) {
               </View>
               {isKeyboardHide ? (
                 <>
-                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onSignup}>
-                    <Text style={styles.buttonTitle}>Зареєструватись</Text>
+                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onLogin}>
+                    <Text style={styles.buttonTitle}>Увійти</Text>
                   </TouchableOpacity>
-                  <Text
-                    style={styles.loginLink}
-                    onPress={() => {
-                      showScreen('Login');
-                    }}
+                  <TouchableOpacity
+                    activeOpacity={0.6}
+                    style={styles.registerLink}
+                    onPress={() => navigation.navigate('Registration')}
                   >
-                    Вже є акаунт? Увійти
-                  </Text>
+                    <Text style={styles.registerLinkText}>Нема акаунту? Зареєструватись</Text>
+                  </TouchableOpacity>
                 </>
               ) : null}
             </View>
@@ -201,27 +163,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   formContainer: {
-    paddingTop: 92,
+    paddingTop: 32,
     justifyContent: 'flex-start',
     backgroundColor: '#fff',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-  },
-  photoContainer: {
-    position: 'absolute',
-    top: -60,
-    left: Dimensions.get('window').width * 0.5 - 60,
-    flex: 1,
-    width: 120,
-    height: 120,
-    borderRadius: 16,
-    backgroundColor: '#f6f6f6',
-  },
-  // userPhoto: {},
-  photoButtonContainer: {
-    position: 'absolute',
-    top: 81,
-    left: 107,
   },
   header: {
     marginBottom: 32,
@@ -267,8 +213,10 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#fff',
   },
-  loginLink: {
+  registerLink: {
     marginTop: 16,
+  },
+  registerLinkText: {
     fontFamily: 'Roboto-Regular',
     textAlign: 'center',
     fontSize: 16,

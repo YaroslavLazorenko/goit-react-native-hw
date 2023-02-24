@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import { NavigationContainer } from '@react-navigation/native';
 
-import LoginScreen from './Screens/LoginScreen';
-import RegistrationScreen from './Screens/RegistrationScreen';
-import { View } from 'react-native';
+import useRoute from './router';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [screen, setScreen] = useState('Registration');
+
+  const routing = useRoute(false);
 
   useEffect(() => {
     async function prepare() {
@@ -38,10 +38,11 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      {screen === 'Registration' && <RegistrationScreen showScreen={setScreen} />}
-      {screen === 'Login' && <LoginScreen showScreen={setScreen} />}
-    </View>
+    <NavigationContainer>
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        {routing}
+      </View>
+    </NavigationContainer>
   );
 }
 
