@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import { AuthContext } from '../../context';
+
 const INITIAL_STATE = {
   email: '',
   password: '',
@@ -26,6 +28,8 @@ export default function LoginScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
   const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
   const [focusedInput, setFocusedInput] = useState(null);
+
+  const { setIsAuth } = useContext(AuthContext);
 
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
@@ -57,7 +61,7 @@ export default function LoginScreen({ navigation }) {
     console.log('password: ', password);
     hideKeyboard();
     resetForm();
-    navigation.navigate('Home');
+    setIsAuth(true);
   };
 
   return (

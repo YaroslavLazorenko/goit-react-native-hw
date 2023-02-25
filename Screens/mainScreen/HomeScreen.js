@@ -1,5 +1,9 @@
-import PostsScreen from './PostsScreen';
+import { useEffect } from 'react';
+import { View, Button } from 'react-native';
+export default function HomeScreen({ navigation }) {
+  useEffect(() => {
+    navigation.navigate('Tabs', { screen: 'Публікації' });
+  }, []);
 
-export default function HomeScreen() {
-  return <PostsScreen />;
+  return null;
 }

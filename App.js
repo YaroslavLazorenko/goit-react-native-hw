@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
+import { AuthContext } from './context';
 
 import useRoute from './router';
 
@@ -10,8 +11,9 @@ SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
 
-  const routing = useRoute(false);
+  const routing = useRoute(isAuth);
 
   useEffect(() => {
     async function prepare() {
@@ -38,11 +40,13 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <View style={styles.container} onLayout={onLayoutRootView}>
-        {routing}
-      </View>
-    </NavigationContainer>
+    <AuthContext.Provider value={{ isAuth, setIsAuth }}>
+      <NavigationContainer>
+        <View style={styles.container} onLayout={onLayoutRootView}>
+          {routing}
+        </View>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
 
