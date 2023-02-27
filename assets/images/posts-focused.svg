@@ -1,0 +1,17 @@
+<svg width="70" height="40" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>background</title>
+  <rect x="-1" y="-1" width="10.75" height="7" id="canvas_background" fill="none"/>
+ </g>
+
+ <g>
+  <title>Layer 1</title>
+  <rect width="70" height="40" rx="20" fill="#FF6C00" id="svg_1"/>
+  <g id="svg_2">
+   <path id="svg_3" stroke-linejoin="round" stroke-linecap="round" stroke-opacity="0.8" stroke="white" d="m25.875,11l7,0l0,7l-7,0l0,-7z" clip-rule="evenodd" fill-rule="evenodd"/>
+   <path id="svg_4" stroke-linejoin="round" stroke-linecap="round" stroke-opacity="0.8" stroke="white" d="m36.875,11l7,0l0,7l-7,0l0,-7z" clip-rule="evenodd" fill-rule="evenodd"/>
+   <path id="svg_5" stroke-linejoin="round" stroke-linecap="round" stroke-opacity="0.8" stroke="white" d="m36.875,22l7,0l0,7l-7,0l0,-7z" clip-rule="evenodd" fill-rule="evenodd"/>
+   <path id="svg_6" stroke-linejoin="round" stroke-linecap="round" stroke-opacity="0.8" stroke="white" d="m25.875,22l7,0l0,7l-7,0l0,-7z" clip-rule="evenodd" fill-rule="evenodd"/>
+  </g>
+ </g>
+</svg>

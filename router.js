@@ -3,7 +3,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 
 import LoginScreen from './Screens/auth/LoginScreen';
 import RegistrationScreen from './Screens/auth/RegistrationScreen';
@@ -17,6 +16,12 @@ import { AuthContext } from './context';
 
 import SignOutIcon from './assets/images/log-out.svg';
 import GoBackIcon from './assets/images/arrow-left.svg';
+import PostsFocusedIcon from './assets/images/posts-focused.svg';
+import PostsUnfocusedIcon from './assets/images/posts-unfocused.svg';
+import CreatePostFocusedIcon from './assets/images/create-post-focused.svg';
+import CreatePostUnfocusedIcon from './assets/images/create-post-unfocused.svg';
+import ProfileFocusedIcon from './assets/images/profile-focused.svg';
+import ProfileUnfocusedIcon from './assets/images/profile-unfocused.svg';
 
 const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
@@ -32,9 +37,9 @@ const TabRouter = () => {
     <MainTab.Navigator screenOptions={{ tabBarShowLabel: false }}>
       <MainTab.Screen
         options={{
-          tabBarIcon: ({ focused, size, color }) => (
-            <MaterialCommunityIcons name="postage-stamp" size={size} color={color} />
-          ),
+          tabBarIcon: ({ focused }) => {
+            return focused ? <PostsFocusedIcon /> : <PostsUnfocusedIcon />;
+          },
           title: 'Публікації',
           headerTitleAlign: 'center',
           headerStyle: {
@@ -47,16 +52,16 @@ const TabRouter = () => {
             fontWeight: '500',
             fontSize: 17,
           },
-          headerRight: () => <SignOutIcon style={{ marginRight: 10 }} onPress={signOut} />,
+          headerRight: () => <SignOutIcon style={{ marginRight: 16 }} onPress={signOut} />,
         }}
         name="Posts"
         component={PostsScreen}
       />
       <MainTab.Screen
         options={({ navigation }) => ({
-          tabBarIcon: ({ focused, size, color }) => (
-            <AntDesign name="pluscircleo" size={size} color={color} />
-          ),
+          tabBarIcon: ({ focused }) => {
+            return focused ? <CreatePostFocusedIcon /> : <CreatePostUnfocusedIcon />;
+          },
           title: 'Створити публікацію',
           headerTitleAlign: 'center',
           headerStyle: {
@@ -83,9 +88,9 @@ const TabRouter = () => {
       />
       <MainTab.Screen
         options={{
-          tabBarIcon: ({ focused, size, color }) => (
-            <MaterialCommunityIcons name="face-man-profile" size={size} color={color} />
-          ),
+          tabBarIcon: ({ focused }) => {
+            return focused ? <ProfileFocusedIcon /> : <ProfileUnfocusedIcon />;
+          },
           headerShown: false,
         }}
         name="Profile"
