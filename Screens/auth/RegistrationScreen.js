@@ -8,10 +8,11 @@ import {
   TouchableWithoutFeedback,
   ImageBackground,
   Platform,
-  // Image,
+  Image,
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 
 import { AuthContext } from '../../context';
@@ -94,12 +95,20 @@ export default function RegistrationScreen({ navigation }) {
               }}
             >
               <View style={styles.photoContainer}>
-                {/* <Image
-                  style={styles.userPhoto}
-                  source={require('../assets/images/user-photo.jpg')}
-                /> */}
+                <View style={styles.imageContainer}>
+                  <Image
+                    style={styles.userPhoto}
+                    source={require('../../assets/images/user-photo.jpg')}
+                  />
+                </View>
                 <View style={styles.photoButtonContainer}>
-                  <AddPhotoImage width={25} height={25} />
+                  <AddPhotoImage
+                    width={25}
+                    height={25}
+                    onPress={() => {
+                      Alert.alert('Alert', 'This functionality is under development...');
+                    }}
+                  />
                 </View>
               </View>
               <Text style={styles.header}>Реєстрація</Text>
@@ -193,10 +202,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backgroundImage: {
+    flex: 1,
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    resizeMode: 'stretch',
-    flex: 1,
     justifyContent: 'flex-end',
     resizeMode: 'cover',
     alignItems: 'center',
@@ -217,12 +225,20 @@ const styles = StyleSheet.create({
     top: -60,
     left: Dimensions.get('window').width * 0.5 - 60,
     flex: 1,
+  },
+  imageContainer: {
+    flex: 1,
     width: 120,
     height: 120,
     borderRadius: 16,
     backgroundColor: '#f6f6f6',
+    overflow: 'hidden',
   },
-  // userPhoto: {},
+  userPhoto: {
+    width: 120,
+    height: 120,
+    resizeMode: 'cover',
+  },
   photoButtonContainer: {
     position: 'absolute',
     top: 81,
