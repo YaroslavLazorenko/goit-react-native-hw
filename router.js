@@ -2,8 +2,6 @@ import { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import LoginScreen from './Screens/auth/LoginScreen';
 import RegistrationScreen from './Screens/auth/RegistrationScreen';
 import HomeScreen from './Screens/mainScreen/HomeScreen';

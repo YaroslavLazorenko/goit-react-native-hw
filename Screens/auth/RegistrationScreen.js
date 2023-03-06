@@ -25,6 +25,7 @@ const INITIAL_STATE = {
   password: '',
   showPassword: false,
   isKeyboardHide: true,
+  focusedInput: null,
 };
 
 export default function RegistrationScreen({ navigation }) {
@@ -33,7 +34,7 @@ export default function RegistrationScreen({ navigation }) {
   const [password, setPassword] = useState(INITIAL_STATE.password);
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
   const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
-  const [focusedInput, setFocusedInput] = useState(null);
+  const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
 
   const { setIsAuth } = useContext(AuthContext);
 
