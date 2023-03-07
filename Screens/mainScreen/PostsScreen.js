@@ -5,7 +5,7 @@ import LocationIcon from '../../assets/images/map-pin.svg';
 
 import { userData } from '../../userData';
 
-const PostListItem = ({ item }) => {
+const PostListItem = ({ item, navigation }) => {
   return (
     <View>
       <View style={styles.postPhotoContainer}>
@@ -18,6 +18,7 @@ const PostListItem = ({ item }) => {
             <CommentsIcon
               fill={item.commentsNumber === 0 ? '#fff' : '#ff6c00'}
               style={{ color: item.commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
+              onPress={() => navigation.navigate('Comments')}
             />
             <Text
               style={{
@@ -40,7 +41,7 @@ const PostListItem = ({ item }) => {
   );
 };
 
-export default function PostsScreen() {
+export default function PostsScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.userContainer}>
@@ -54,7 +55,7 @@ export default function PostsScreen() {
       </View>
       <FlatList
         data={userData.posts}
-        renderItem={({ item }) => <PostListItem item={item} />}
+        renderItem={({ item }) => <PostListItem item={item} navigation={navigation} />}
         keyExtractor={item => item.id}
       />
     </SafeAreaView>
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
   postDescriptionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 34,
+    marginBottom: 32,
   },
   postCommentsContainer: {
     flexDirection: 'row',

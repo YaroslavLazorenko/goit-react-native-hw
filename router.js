@@ -27,6 +27,7 @@ const MainTab = createBottomTabNavigator();
 
 const TabRouter = () => {
   const { setIsAuth } = useContext(AuthContext);
+
   const signOut = () => {
     setIsAuth(false);
   };
