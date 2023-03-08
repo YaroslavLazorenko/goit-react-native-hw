@@ -9,6 +9,7 @@ import PostsScreen from './Screens/mainScreen/PostsScreen';
 import CreatePostsScreen from './Screens/mainScreen/CreatePostsScreen';
 import ProfileScreen from './Screens/mainScreen/ProfileScreen';
 import CommentsScreen from './Screens/mainScreen/CommentsScreen';
+import MapScreen from './Screens/mainScreen/MapScreen';
 
 import { AuthContext } from './context';
 
@@ -147,9 +148,48 @@ export default function useRoute(isAuth) {
               }}
             />
           ),
+          title: 'Коментарі',
+          headerTitleAlign: 'center',
+          headerStyle: {
+            height: 88,
+            backgroundColor: '#fff',
+          },
+          headerTintColor: '#212121',
+          headerTitleStyle: {
+            fontFamily: 'Roboto-Regular',
+            fontWeight: '500',
+            fontSize: 17,
+          },
         })}
         name="Comments"
         component={CommentsScreen}
+      />
+      <MainStack.Screen
+        options={({ navigation }) => ({
+          headerShown: true,
+          headerLeft: () => (
+            <GoBackIcon
+              style={{ marginLeft: 16 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            />
+          ),
+          title: 'Карта',
+          headerTitleAlign: 'center',
+          headerStyle: {
+            height: 88,
+            backgroundColor: '#fff',
+          },
+          headerTintColor: '#212121',
+          headerTitleStyle: {
+            fontFamily: 'Roboto-Regular',
+            fontWeight: '500',
+            fontSize: 17,
+          },
+        })}
+        name="Map"
+        component={MapScreen}
       />
     </MainStack.Navigator>
   );

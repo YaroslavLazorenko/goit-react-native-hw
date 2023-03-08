@@ -1,4 +1,13 @@
-import { View, SafeAreaView, Text, FlatList, Image, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  SafeAreaView,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 
 import CommentsIcon from '../../assets/images/comments.svg';
 import LocationIcon from '../../assets/images/map-pin.svg';
@@ -14,11 +23,14 @@ const PostListItem = ({ item, navigation }) => {
       <View>
         <Text style={styles.title}>{item.title}</Text>
         <View style={styles.postDescriptionContainer}>
-          <View style={styles.postCommentsContainer}>
+          <TouchableOpacity
+            style={styles.postCommentsContainer}
+            activeOpacity={0.6}
+            onPress={() => navigation.navigate('Comments')}
+          >
             <CommentsIcon
               fill={item.commentsNumber === 0 ? '#fff' : '#ff6c00'}
               style={{ color: item.commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
-              onPress={() => navigation.navigate('Comments')}
             />
             <Text
               style={{
@@ -28,13 +40,19 @@ const PostListItem = ({ item, navigation }) => {
             >
               {item.commentsNumber}
             </Text>
-          </View>
-          <View style={styles.postLocationContainer}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.postLocationContainer}
+            activeOpacity={0.6}
+            onPress={() => navigation.navigate('Map', item)}
+          >
             <LocationIcon />
-            <Text
-              style={styles.postLocation}
-            >{`${item.locationRegion}, ${item.locationCountry}`}</Text>
-          </View>
+            <Text style={styles.postLocation}>
+              {item.locationCountry
+                ? `${item.locationRegion}, ${item.locationCountry}`
+                : item.locationRegion}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

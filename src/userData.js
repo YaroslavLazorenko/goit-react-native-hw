@@ -10,6 +10,10 @@ export const userData = {
       likesNumber: 177,
       locationRegion: 'Івано-Франківщина',
       locationCountry: 'Україна',
+      location: {
+        latitude: 48.502234,
+        longitude: 24.35083,
+      },
     },
     {
       id: '2222',
@@ -19,6 +23,10 @@ export const userData = {
       likesNumber: 220,
       locationRegion: 'Затока',
       locationCountry: 'Україна',
+      location: {
+        latitude: 46.095246,
+        longitude: 30.487479,
+      },
     },
     {
       id: '3333',
@@ -28,6 +36,10 @@ export const userData = {
       likesNumber: 200,
       locationRegion: 'Венеція',
       locationCountry: 'Італія',
+      location: {
+        latitude: 45.453887,
+        longitude: 12.352767,
+      },
     },
   ],
 };

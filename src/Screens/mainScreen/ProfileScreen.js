@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   FlatList,
+  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
@@ -65,11 +66,14 @@ const PostListItem = ({ item, navigation }) => {
         <Text style={styles.title}>{item.title}</Text>
         <View style={styles.postDescriptionContainer}>
           <View style={styles.postReactionsContainer}>
-            <View style={styles.postCommentsContainer}>
+            <TouchableOpacity
+              style={styles.postCommentsContainer}
+              activeOpacity={0.6}
+              onPress={() => navigation.navigate('Comments')}
+            >
               <CommentsIcon
                 fill={item.commentsNumber === 0 ? '#fff' : '#ff6c00'}
                 style={{ color: item.commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
-                onPress={() => navigation.navigate('Comments')}
               />
               <Text
                 style={{
@@ -79,7 +83,7 @@ const PostListItem = ({ item, navigation }) => {
               >
                 {item.commentsNumber}
               </Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.postLikesContainer}>
               <ThumbsUpIcon style={{ color: item.likesNumber === 0 ? '#bdbdbd' : '#ff6c00' }} />
               <Text
@@ -92,10 +96,14 @@ const PostListItem = ({ item, navigation }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.postLocationContainer}>
+          <TouchableOpacity
+            style={styles.postLocationContainer}
+            activeOpacity={0.6}
+            onPress={() => navigation.navigate('Map', item)}
+          >
             <LocationIcon />
             <Text style={styles.postLocation}>{item.locationCountry}</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
