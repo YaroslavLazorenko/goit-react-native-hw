@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   View,
   SafeAreaView,
@@ -59,7 +60,15 @@ const PostListItem = ({ item, navigation }) => {
   );
 };
 
-export default function PostsScreen({ navigation }) {
+export default function PostsScreen({ navigation, route }) {
+  const [posts, setPosts] = useState(userData.posts);
+
+  useEffect(() => {
+    if (route.params) {
+      setPosts(prevState => [...prevState, route.params]);
+    }
+  }, [route.params]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.userContainer}>
@@ -72,7 +81,7 @@ export default function PostsScreen({ navigation }) {
         </View>
       </View>
       <FlatList
-        data={userData.posts}
+        data={posts}
         renderItem={({ item }) => <PostListItem item={item} navigation={navigation} />}
         keyExtractor={item => item.id}
       />
@@ -133,6 +142,8 @@ const styles = StyleSheet.create({
   },
   postPhoto: {
     flex: 1,
+    width: Dimensions.get('window').width * 0.91,
+    height: 240,
     resizeMode: 'cover',
   },
   title: {

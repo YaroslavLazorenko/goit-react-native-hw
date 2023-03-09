@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   SafeAreaView,
@@ -8,31 +8,61 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Platform,
-  // Image,
+  Image,
   Text,
   Alert,
   TextInput,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import * as Location from 'expo-location';
+import { Camera } from 'expo-camera';
+import { customAlphabet } from 'nanoid/non-secure';
 
-import DownloadPhotoImage from '../../assets/images/download-photo.svg';
+import DownloadPhotoIcon from '../../assets/images/download-photo.svg';
+import EditPhotoIcon from '../../assets/images/edit-photo.svg';
 import LocationIcon from '../../assets/images/map-pin.svg';
 
 const INITIAL_STATE = {
   title: '',
-  location: '',
-  isPhotoDownloaded: false,
+  locality: '',
   isKeyboardHide: true,
   focusedInput: null,
+  hasCameraPermission: null,
+  hasGeolocationPermission: null,
+  cameraRef: null,
+  photo: null,
+  isPhotoDownloaded: false,
 };
 
-export default function CreatePostsScreen() {
-  const [isPhotoDownloaded, setIsPhotoDownloaded] = useState(INITIAL_STATE.isPhotoDownloaded);
+export default function CreatePostsScreen({ navigation }) {
   const [title, setTitle] = useState(INITIAL_STATE.title);
-  const [location, setLocation] = useState(INITIAL_STATE.location);
+  const [locality, setLocality] = useState(INITIAL_STATE.locality);
   const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
   const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
+  const [hasCameraPermission, setHasCameraPermission] = useState(INITIAL_STATE.hasCameraPermission);
+  const [hasGeolocationPermission, setHasGeolocationPermission] = useState(
+    INITIAL_STATE.hasGeolocationPermission,
+  );
+  const [cameraRef, setCameraRef] = useState(INITIAL_STATE.cameraRef);
+  const [photo, setPhoto] = useState(INITIAL_STATE.photo);
+  const [isPhotoDownloaded, setIsPhotoDownloaded] = useState(INITIAL_STATE.isPhotoDownloaded);
+
+  useEffect(() => {
+    (async () => {
+      let { status: geolocationStatus } = await Location.requestForegroundPermissionsAsync();
+      if (geolocationStatus !== 'granted') {
+        Alert.alert('Alert', 'Permission to access location was denied');
+      }
+      setHasGeolocationPermission(geolocationStatus === 'granted');
+
+      let { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+      if (cameraStatus !== 'granted') {
+        Alert.alert('Alert', 'Permission to access camera was denied');
+      }
+      setHasCameraPermission(cameraStatus === 'granted');
+    })();
+  }, []);
 
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
@@ -43,25 +73,53 @@ export default function CreatePostsScreen() {
     setTitle(text);
   };
 
-  const locationHandler = text => {
-    setLocation(text);
+  const localityHandler = text => {
+    setLocality(text);
+  };
+
+  const takePhoto = async () => {
+    const photo = await cameraRef.takePictureAsync();
+    setPhoto(photo.uri);
+    setIsPhotoDownloaded(true);
   };
 
   const resetForm = () => {
     setTitle(INITIAL_STATE.title);
-    setLocation(INITIAL_STATE.location);
+    setLocality(INITIAL_STATE.locality);
+    setHasCameraPermission(INITIAL_STATE.hasCameraPermission);
+    setHasGeolocationPermission(INITIAL_STATE.hasGeolocationPermission);
+    setPhoto(INITIAL_STATE.photo);
     setIsPhotoDownloaded(INITIAL_STATE.isPhotoDownloaded);
   };
 
   const onPost = () => {
-    console.log('Create post data:');
-    console.log('title: ', title);
-    console.log('location: ', location);
     hideKeyboard();
-    resetForm();
+
+    (async () => {
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
+      const post = {
+        id: nanoid(),
+        title,
+        photo: { uri: photo },
+        commentsNumber: 0,
+        likesNumber: 0,
+        locationRegion: locality,
+        location: coords,
+      };
+
+      resetForm();
+      navigation.navigate('Posts', post);
+    })();
   };
 
-  const isDataEntered = title && location;
+  const isPublishAllowed =
+    title && locality && hasCameraPermission && hasGeolocationPermission && isPhotoDownloaded;
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -74,16 +132,36 @@ export default function CreatePostsScreen() {
             {isKeyboardHide ? (
               <>
                 <View style={styles.postPhotoContainer}>
-                  {/* <Image style={styles.postPhoto} source={} /> */}
-                  <View style={styles.photoButtonContainer}>
-                    <DownloadPhotoImage
-                      width={60}
-                      height={60}
-                      onPress={() => {
-                        Alert.alert('Alert', 'This functionality is under development...');
-                      }}
-                    />
-                  </View>
+                  <Camera
+                    style={styles.camera}
+                    type={Camera.Constants.Type.back}
+                    ref={ref => {
+                      setCameraRef(ref);
+                    }}
+                  >
+                    {photo ? (
+                      <Image
+                        style={{
+                          ...styles.postPhoto,
+                          width: isPhotoDownloaded ? Dimensions.get('window').width * 0.91 : 0,
+                          height: isPhotoDownloaded ? Dimensions.get('window').width * 0.91 : 0,
+                        }}
+                        source={{ uri: photo }}
+                      />
+                    ) : null}
+                    <TouchableOpacity
+                      style={styles.photoButtonContainer}
+                      onPress={
+                        isPhotoDownloaded ? () => setIsPhotoDownloaded(false) : () => takePhoto()
+                      }
+                    >
+                      {isPhotoDownloaded ? (
+                        <EditPhotoIcon width={60} height={60} />
+                      ) : (
+                        <DownloadPhotoIcon width={60} height={60} />
+                      )}
+                    </TouchableOpacity>
+                  </Camera>
                 </View>
                 <Text style={styles.photoMessage}>
                   {isPhotoDownloaded ? 'Редагувати фото' : 'Завантажте фото'}
@@ -131,11 +209,11 @@ export default function CreatePostsScreen() {
                 maxLength={40}
                 onSubmitEditing={hideKeyboard}
                 style={{ ...styles.input, marginLeft: 4 }}
-                value={location}
-                onChangeText={locationHandler}
+                value={locality}
+                onChangeText={localityHandler}
                 onFocus={() => {
                   setIsKeyboardHide(false);
-                  setFocusedInput('location');
+                  setFocusedInput('locality');
                 }}
                 onBlur={() => {
                   setFocusedInput(null);
@@ -146,14 +224,17 @@ export default function CreatePostsScreen() {
             {isKeyboardHide ? (
               <TouchableOpacity
                 activeOpacity={0.8}
-                style={{ ...styles.button, backgroundColor: isDataEntered ? '#ff6c00' : '#f6f6f6' }}
-                disabled={!isDataEntered}
+                style={{
+                  ...styles.button,
+                  backgroundColor: isPublishAllowed ? '#ff6c00' : '#f6f6f6',
+                }}
+                disabled={!isPublishAllowed}
                 onPress={onPost}
               >
                 <Text
                   style={{
                     ...styles.buttonTitle,
-                    color: isDataEntered ? '#fff' : '#bdbdbd',
+                    color: isPublishAllowed ? '#fff' : '#bdbdbd',
                   }}
                 >
                   Опублікувати
@@ -186,9 +267,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f6f6f6',
     overflow: 'hidden',
   },
-  // postPhoto: {
-  //   resizeMode: 'cover',
-  // },
+  camera: {
+    height: Dimensions.get('window').width,
+  },
+  postPhoto: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   photoButtonContainer: {
     position: 'absolute',
     top: 90,
