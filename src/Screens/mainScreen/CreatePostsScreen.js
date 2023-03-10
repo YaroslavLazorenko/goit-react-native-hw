@@ -77,6 +77,11 @@ export default function CreatePostsScreen({ navigation }) {
     setLocality(text);
   };
 
+  const snapHandler = () => {
+    if (isPhotoDownloaded) return setIsPhotoDownloaded(false);
+    takePhoto();
+  };
+
   const takePhoto = async () => {
     const photo = await cameraRef.takePictureAsync();
     setPhoto(photo.uri);
@@ -107,10 +112,10 @@ export default function CreatePostsScreen({ navigation }) {
         id: nanoid(),
         title,
         photo: { uri: photo },
-        commentsNumber: 0,
         likesNumber: 0,
         locationRegion: locality,
         location: coords,
+        comments: [],
       };
 
       resetForm();
@@ -151,9 +156,8 @@ export default function CreatePostsScreen({ navigation }) {
                     ) : null}
                     <TouchableOpacity
                       style={styles.photoButtonContainer}
-                      onPress={
-                        isPhotoDownloaded ? () => setIsPhotoDownloaded(false) : () => takePhoto()
-                      }
+                      activeOpacity={0.8}
+                      onPress={snapHandler}
                     >
                       {isPhotoDownloaded ? (
                         <EditPhotoIcon width={60} height={60} />

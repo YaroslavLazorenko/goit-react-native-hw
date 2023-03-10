@@ -57,42 +57,45 @@ const UpperComponent = () => {
 };
 
 const PostListItem = ({ item, navigation }) => {
+  const { comments, photo, title, likesNumber, locationCountry } = item;
+  const commentsNumber = comments.length;
+
   return (
     <View style={styles.postItemContainer}>
       <View style={styles.postPhotoContainer}>
-        <Image style={styles.postPhoto} source={item.photo} />
+        <Image style={styles.postPhoto} source={photo} />
       </View>
       <View>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{title}</Text>
         <View style={styles.postDescriptionContainer}>
           <View style={styles.postReactionsContainer}>
             <TouchableOpacity
               style={styles.postCommentsContainer}
               activeOpacity={0.6}
-              onPress={() => navigation.navigate('Comments')}
+              onPress={() => navigation.navigate('Comments', { comments, photo })}
             >
               <CommentsIcon
-                fill={item.commentsNumber === 0 ? '#fff' : '#ff6c00'}
-                style={{ color: item.commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
+                fill={commentsNumber === 0 ? '#fff' : '#ff6c00'}
+                style={{ color: commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
               />
               <Text
                 style={{
                   ...styles.postCommentsNumber,
-                  color: item.commentsNumber === 0 ? '#bdbdbd' : '#212121',
+                  color: commentsNumber === 0 ? '#bdbdbd' : '#212121',
                 }}
               >
-                {item.commentsNumber}
+                {commentsNumber}
               </Text>
             </TouchableOpacity>
             <View style={styles.postLikesContainer}>
-              <ThumbsUpIcon style={{ color: item.likesNumber === 0 ? '#bdbdbd' : '#ff6c00' }} />
+              <ThumbsUpIcon style={{ color: likesNumber === 0 ? '#bdbdbd' : '#ff6c00' }} />
               <Text
                 style={{
                   ...styles.postLikesNumber,
-                  color: item.likesNumber === 0 ? '#bdbdbd' : '#212121',
+                  color: likesNumber === 0 ? '#bdbdbd' : '#212121',
                 }}
               >
-                {item.likesNumber}
+                {likesNumber}
               </Text>
             </View>
           </View>
@@ -102,7 +105,7 @@ const PostListItem = ({ item, navigation }) => {
             onPress={() => navigation.navigate('Map', item)}
           >
             <LocationIcon />
-            <Text style={styles.postLocation}>{item.locationCountry}</Text>
+            <Text style={styles.postLocation}>{locationCountry}</Text>
           </TouchableOpacity>
         </View>
       </View>

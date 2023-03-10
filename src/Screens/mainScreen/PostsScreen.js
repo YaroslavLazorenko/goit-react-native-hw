@@ -16,30 +16,33 @@ import LocationIcon from '../../assets/images/map-pin.svg';
 import { userData } from '../../userData';
 
 const PostListItem = ({ item, navigation }) => {
+  const { comments, photo, title, locationRegion, locationCountry } = item;
+  const commentsNumber = comments.length;
+
   return (
     <View>
       <View style={styles.postPhotoContainer}>
-        <Image style={styles.postPhoto} source={item.photo} />
+        <Image style={styles.postPhoto} source={photo} />
       </View>
       <View>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{title}</Text>
         <View style={styles.postDescriptionContainer}>
           <TouchableOpacity
             style={styles.postCommentsContainer}
             activeOpacity={0.6}
-            onPress={() => navigation.navigate('Comments')}
+            onPress={() => navigation.navigate('Comments', { comments, photo })}
           >
             <CommentsIcon
-              fill={item.commentsNumber === 0 ? '#fff' : '#ff6c00'}
-              style={{ color: item.commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
+              fill={commentsNumber === 0 ? '#fff' : '#ff6c00'}
+              style={{ color: commentsNumber === 0 ? '#bdbdbd' : '#fff' }}
             />
             <Text
               style={{
                 ...styles.postCommentsNumber,
-                color: item.commentsNumber === 0 ? '#bdbdbd' : '#212121',
+                color: commentsNumber === 0 ? '#bdbdbd' : '#212121',
               }}
             >
-              {item.commentsNumber}
+              {commentsNumber}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -49,9 +52,7 @@ const PostListItem = ({ item, navigation }) => {
           >
             <LocationIcon />
             <Text style={styles.postLocation}>
-              {item.locationCountry
-                ? `${item.locationRegion}, ${item.locationCountry}`
-                : item.locationRegion}
+              {locationCountry ? `${locationRegion}, ${locationCountry}` : locationRegion}
             </Text>
           </TouchableOpacity>
         </View>
