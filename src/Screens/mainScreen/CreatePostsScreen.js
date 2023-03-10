@@ -91,9 +91,6 @@ export default function CreatePostsScreen({ navigation }) {
   const resetForm = () => {
     setTitle(INITIAL_STATE.title);
     setLocality(INITIAL_STATE.locality);
-    setHasCameraPermission(INITIAL_STATE.hasCameraPermission);
-    setHasGeolocationPermission(INITIAL_STATE.hasGeolocationPermission);
-    setPhoto(INITIAL_STATE.photo);
     setIsPhotoDownloaded(INITIAL_STATE.isPhotoDownloaded);
   };
 
