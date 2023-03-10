@@ -3,8 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+
 import { AuthContext } from './context';
 
+import { store } from './redux/store';
 import useRoute from './router';
 
 SplashScreen.preventAutoHideAsync();
@@ -40,13 +43,15 @@ export default function App() {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuth, setIsAuth }}>
-      <NavigationContainer>
-        <View style={styles.container} onLayout={onLayoutRootView}>
-          {routing}
-        </View>
-      </NavigationContainer>
-    </AuthContext.Provider>
+    <Provider store={store}>
+      <AuthContext.Provider value={{ isAuth, setIsAuth }}>
+        <NavigationContainer>
+          <View style={styles.container} onLayout={onLayoutRootView}>
+            {routing}
+          </View>
+        </NavigationContainer>
+      </AuthContext.Provider>
+    </Provider>
   );
 }
 
