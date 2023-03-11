@@ -1,6 +1,6 @@
-import { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useDispatch } from 'react-redux';
 
 import LoginScreen from './Screens/auth/LoginScreen';
 import RegistrationScreen from './Screens/auth/RegistrationScreen';
@@ -11,7 +11,7 @@ import ProfileScreen from './Screens/mainScreen/ProfileScreen';
 import CommentsScreen from './Screens/mainScreen/CommentsScreen';
 import MapScreen from './Screens/mainScreen/MapScreen';
 
-import { AuthContext } from './context';
+import { authSignOutUser } from './redux/auth/authOperations';
 
 import SignOutIcon from './assets/images/log-out.svg';
 import GoBackIcon from './assets/images/arrow-left.svg';
@@ -27,10 +27,10 @@ const MainStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
 
 const TabRouter = () => {
-  const { setIsAuth } = useContext(AuthContext);
+  const dispatch = useDispatch();
 
   const signOut = () => {
-    setIsAuth(false);
+    dispatch(authSignOutUser());
   };
 
   return (
@@ -52,7 +52,9 @@ const TabRouter = () => {
             fontWeight: '500',
             fontSize: 17,
           },
-          headerRight: () => <SignOutIcon style={{ marginRight: 16 }} onPress={signOut} />,
+          headerRight: () => (
+            <SignOutIcon style={{ marginRight: 16 }} onPress={signOut} />
+          ),
         }}
         name="Posts"
         component={PostsScreen}
@@ -60,7 +62,11 @@ const TabRouter = () => {
       <MainTab.Screen
         options={({ navigation }) => ({
           tabBarIcon: ({ focused }) => {
-            return focused ? <CreatePostFocusedIcon /> : <CreatePostUnfocusedIcon />;
+            return focused ? (
+              <CreatePostFocusedIcon />
+            ) : (
+              <CreatePostUnfocusedIcon />
+            );
           },
           title: 'Створити публікацію',
           headerTitleAlign: 'center',

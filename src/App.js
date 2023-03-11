@@ -2,26 +2,23 @@ import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 
-import { AuthContext } from './context';
+import Main from './components/Main';
 
 import { store } from './redux/store';
-import useRoute from './router';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
-
-  const routing = useRoute(isAuth);
 
   useEffect(() => {
     async function prepare() {
       try {
-        await Font.loadAsync({ 'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf') });
+        await Font.loadAsync({
+          'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
+        });
       } catch (error) {
         console.warn(error);
       } finally {
@@ -44,13 +41,9 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <AuthContext.Provider value={{ isAuth, setIsAuth }}>
-        <NavigationContainer>
-          <View style={styles.container} onLayout={onLayoutRootView}>
-            {routing}
-          </View>
-        </NavigationContainer>
-      </AuthContext.Provider>
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        <Main />
+      </View>
     </Provider>
   );
 }

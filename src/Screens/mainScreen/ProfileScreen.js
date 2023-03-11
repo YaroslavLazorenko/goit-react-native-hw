@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import {
   View,
   SafeAreaView,
@@ -11,8 +10,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 
-import { AuthContext } from '../../context';
+import { authSignOutUser } from '../../redux/auth/authOperations';
 
 import RemovePhotoImage from '../../assets/images/remove-photo.svg';
 import SignOutIcon from '../../assets/images/log-out.svg';
@@ -23,10 +23,10 @@ import LocationIcon from '../../assets/images/map-pin.svg';
 import { userData } from '../../userData';
 
 const UpperComponent = () => {
-  const { setIsAuth } = useContext(AuthContext);
+  const dispatch = useDispatch();
 
   const signOut = () => {
-    setIsAuth(false);
+    dispatch(authSignOutUser());
   };
 
   return (
@@ -38,12 +38,18 @@ const UpperComponent = () => {
     >
       <View style={styles.photoContainer}>
         <View style={styles.imageContainer}>
-          <Image style={styles.userPhoto} source={require('../../assets/images/user-photo.jpg')} />
+          <Image
+            style={styles.userPhoto}
+            source={require('../../assets/images/user-photo.jpg')}
+          />
         </View>
         <View style={styles.photoButtonContainer}>
           <RemovePhotoImage
             onPress={() => {
-              Alert.alert('Alert', 'This functionality is under development...');
+              Alert.alert(
+                'Alert',
+                'This functionality is under development...',
+              );
             }}
           />
         </View>
@@ -72,7 +78,9 @@ const PostListItem = ({ item, navigation }) => {
             <TouchableOpacity
               style={styles.postCommentsContainer}
               activeOpacity={0.6}
-              onPress={() => navigation.navigate('Comments', { comments, photo })}
+              onPress={() =>
+                navigation.navigate('Comments', { comments, photo })
+              }
             >
               <CommentsIcon
                 fill={commentsNumber === 0 ? '#fff' : '#ff6c00'}
@@ -88,7 +96,9 @@ const PostListItem = ({ item, navigation }) => {
               </Text>
             </TouchableOpacity>
             <View style={styles.postLikesContainer}>
-              <ThumbsUpIcon style={{ color: likesNumber === 0 ? '#bdbdbd' : '#ff6c00' }} />
+              <ThumbsUpIcon
+                style={{ color: likesNumber === 0 ? '#bdbdbd' : '#ff6c00' }}
+              />
               <Text
                 style={{
                   ...styles.postLikesNumber,

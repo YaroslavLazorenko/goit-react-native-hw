@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -18,8 +18,6 @@ import { useDispatch } from 'react-redux';
 
 import { authSignUpUser } from '../../redux/auth/authOperations';
 
-import { AuthContext } from '../../context';
-
 import AddPhotoImage from '../../assets/images/add-photo.svg';
 
 const INITIAL_STATE = {
@@ -36,12 +34,12 @@ export default function RegistrationScreen({ navigation }) {
   const [email, setEmail] = useState(INITIAL_STATE.email);
   const [password, setPassword] = useState(INITIAL_STATE.password);
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
-  const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
+  const [isKeyboardHide, setIsKeyboardHide] = useState(
+    INITIAL_STATE.isKeyboardHide,
+  );
   const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
 
   const dispatch = useDispatch();
-
-  const { setIsAuth } = useContext(AuthContext);
 
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
@@ -80,7 +78,6 @@ export default function RegistrationScreen({ navigation }) {
     hideKeyboard();
     dispatch(authSignUpUser({ nickname, email, password }));
     resetForm();
-    setIsAuth(true);
   };
 
   return (
@@ -113,7 +110,10 @@ export default function RegistrationScreen({ navigation }) {
                     width={25}
                     height={25}
                     onPress={() => {
-                      Alert.alert('Alert', 'This functionality is under development...');
+                      Alert.alert(
+                        'Alert',
+                        'This functionality is under development...',
+                      );
                     }}
                   />
                 </View>
@@ -127,7 +127,8 @@ export default function RegistrationScreen({ navigation }) {
                 onSubmitEditing={onSignup}
                 style={{
                   ...styles.input,
-                  borderColor: focusedInput === 'nickname' ? '#ff6c00' : '#e8e8e8',
+                  borderColor:
+                    focusedInput === 'nickname' ? '#ff6c00' : '#e8e8e8',
                 }}
                 value={nickname}
                 onChangeText={nicknameHandler}
@@ -168,7 +169,8 @@ export default function RegistrationScreen({ navigation }) {
                   style={{
                     ...styles.input,
                     marginTop: 16,
-                    borderColor: focusedInput === 'password' ? '#ff6c00' : '#e8e8e8',
+                    borderColor:
+                      focusedInput === 'password' ? '#ff6c00' : '#e8e8e8',
                   }}
                   value={password}
                   onChangeText={passwordHandler}
@@ -178,13 +180,20 @@ export default function RegistrationScreen({ navigation }) {
                   }}
                   onBlur={() => setFocusedInput(null)}
                 />
-                <Text style={styles.showPasswordLabel} onPress={showPasswordHandler}>
+                <Text
+                  style={styles.showPasswordLabel}
+                  onPress={showPasswordHandler}
+                >
                   {showPassword ? 'Сховати' : 'Показати'}
                 </Text>
               </View>
               {isKeyboardHide ? (
                 <>
-                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onSignup}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.button}
+                    onPress={onSignup}
+                  >
                     <Text style={styles.buttonTitle}>Зареєструватись</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -192,7 +201,9 @@ export default function RegistrationScreen({ navigation }) {
                     style={styles.loginLink}
                     onPress={() => navigation.navigate('Login')}
                   >
-                    <Text style={styles.loginLinkText}>Вже є акаунт? Увійти</Text>
+                    <Text style={styles.loginLinkText}>
+                      Вже є акаунт? Увійти
+                    </Text>
                   </TouchableOpacity>
                 </>
               ) : null}

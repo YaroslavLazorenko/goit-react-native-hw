@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,8 +12,9 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 
-import { AuthContext } from '../../context';
+import { authSignInUser } from '../../redux/auth/authOperations';
 
 const INITIAL_STATE = {
   email: '',
@@ -26,10 +27,12 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState(INITIAL_STATE.email);
   const [password, setPassword] = useState(INITIAL_STATE.password);
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
-  const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
+  const [isKeyboardHide, setIsKeyboardHide] = useState(
+    INITIAL_STATE.isKeyboardHide,
+  );
   const [focusedInput, setFocusedInput] = useState(null);
 
-  const { setIsAuth } = useContext(AuthContext);
+  const dispatch = useDispatch();
 
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
@@ -60,8 +63,8 @@ export default function LoginScreen({ navigation }) {
     console.log('email: ', email);
     console.log('password: ', password);
     hideKeyboard();
+    dispatch(authSignInUser({ email, password }));
     resetForm();
-    setIsAuth(true);
   };
 
   return (
@@ -113,7 +116,8 @@ export default function LoginScreen({ navigation }) {
                   style={{
                     ...styles.input,
                     marginTop: 16,
-                    borderColor: focusedInput === 'password' ? '#ff6c00' : '#e8e8e8',
+                    borderColor:
+                      focusedInput === 'password' ? '#ff6c00' : '#e8e8e8',
                   }}
                   value={password}
                   onChangeText={passwordHandler}
@@ -123,13 +127,20 @@ export default function LoginScreen({ navigation }) {
                   }}
                   onBlur={() => setFocusedInput(null)}
                 />
-                <Text style={styles.showPasswordLabel} onPress={showPasswordHandler}>
+                <Text
+                  style={styles.showPasswordLabel}
+                  onPress={showPasswordHandler}
+                >
                   {showPassword ? 'Сховати' : 'Показати'}
                 </Text>
               </View>
               {isKeyboardHide ? (
                 <>
-                  <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={onLogin}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.button}
+                    onPress={onLogin}
+                  >
                     <Text style={styles.buttonTitle}>Увійти</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -137,7 +148,9 @@ export default function LoginScreen({ navigation }) {
                     style={styles.registerLink}
                     onPress={() => navigation.navigate('Registration')}
                   >
-                    <Text style={styles.registerLinkText}>Нема акаунту? Зареєструватись</Text>
+                    <Text style={styles.registerLinkText}>
+                      Нема акаунту? Зареєструватись
+                    </Text>
                   </TouchableOpacity>
                 </>
               ) : null}

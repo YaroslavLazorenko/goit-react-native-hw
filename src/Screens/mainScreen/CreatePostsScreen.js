@@ -38,25 +38,34 @@ const INITIAL_STATE = {
 export default function CreatePostsScreen({ navigation }) {
   const [title, setTitle] = useState(INITIAL_STATE.title);
   const [locality, setLocality] = useState(INITIAL_STATE.locality);
-  const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
+  const [isKeyboardHide, setIsKeyboardHide] = useState(
+    INITIAL_STATE.isKeyboardHide,
+  );
   const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
-  const [hasCameraPermission, setHasCameraPermission] = useState(INITIAL_STATE.hasCameraPermission);
+  const [hasCameraPermission, setHasCameraPermission] = useState(
+    INITIAL_STATE.hasCameraPermission,
+  );
   const [hasGeolocationPermission, setHasGeolocationPermission] = useState(
     INITIAL_STATE.hasGeolocationPermission,
   );
+
   const [cameraRef, setCameraRef] = useState(INITIAL_STATE.cameraRef);
   const [photo, setPhoto] = useState(INITIAL_STATE.photo);
-  const [isPhotoDownloaded, setIsPhotoDownloaded] = useState(INITIAL_STATE.isPhotoDownloaded);
+  const [isPhotoDownloaded, setIsPhotoDownloaded] = useState(
+    INITIAL_STATE.isPhotoDownloaded,
+  );
 
   useEffect(() => {
     (async () => {
-      let { status: geolocationStatus } = await Location.requestForegroundPermissionsAsync();
+      let { status: geolocationStatus } =
+        await Location.requestForegroundPermissionsAsync();
       if (geolocationStatus !== 'granted') {
         Alert.alert('Alert', 'Permission to access location was denied');
       }
       setHasGeolocationPermission(geolocationStatus === 'granted');
 
-      let { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+      let { status: cameraStatus } =
+        await Camera.requestCameraPermissionsAsync();
       if (cameraStatus !== 'granted') {
         Alert.alert('Alert', 'Permission to access camera was denied');
       }
@@ -121,7 +130,11 @@ export default function CreatePostsScreen({ navigation }) {
   };
 
   const isPublishAllowed =
-    title && locality && hasCameraPermission && hasGeolocationPermission && isPhotoDownloaded;
+    title &&
+    locality &&
+    hasCameraPermission &&
+    hasGeolocationPermission &&
+    isPhotoDownloaded;
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -145,8 +158,12 @@ export default function CreatePostsScreen({ navigation }) {
                       <Image
                         style={{
                           ...styles.postPhoto,
-                          width: isPhotoDownloaded ? Dimensions.get('window').width * 0.91 : 0,
-                          height: isPhotoDownloaded ? Dimensions.get('window').width * 0.91 : 0,
+                          width: isPhotoDownloaded
+                            ? Dimensions.get('window').width * 0.91
+                            : 0,
+                          height: isPhotoDownloaded
+                            ? Dimensions.get('window').width * 0.91
+                            : 0,
                         }}
                         source={{ uri: photo }}
                       />
@@ -199,7 +216,8 @@ export default function CreatePostsScreen({ navigation }) {
               style={{
                 ...styles.inputContainer,
                 ...styles.locationContainer,
-                borderColor: focusedInput === 'location' ? '#ff6c00' : '#e8e8e8',
+                borderColor:
+                  focusedInput === 'location' ? '#ff6c00' : '#e8e8e8',
               }}
             >
               <LocationIcon />
