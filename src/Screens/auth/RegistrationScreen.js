@@ -14,13 +14,16 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
+
+import { authSignUpUser } from '../../redux/auth/authOperations';
 
 import { AuthContext } from '../../context';
 
 import AddPhotoImage from '../../assets/images/add-photo.svg';
 
 const INITIAL_STATE = {
-  name: '',
+  nickname: '',
   email: '',
   password: '',
   showPassword: false,
@@ -29,12 +32,14 @@ const INITIAL_STATE = {
 };
 
 export default function RegistrationScreen({ navigation }) {
-  const [name, setName] = useState(INITIAL_STATE.name);
+  const [nickname, setNickname] = useState(INITIAL_STATE.nickname);
   const [email, setEmail] = useState(INITIAL_STATE.email);
   const [password, setPassword] = useState(INITIAL_STATE.password);
   const [showPassword, setShowPassword] = useState(INITIAL_STATE.showPassword);
   const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
   const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
+
+  const dispatch = useDispatch();
 
   const { setIsAuth } = useContext(AuthContext);
 
@@ -43,8 +48,8 @@ export default function RegistrationScreen({ navigation }) {
     Keyboard.dismiss();
   };
 
-  const nameHandler = text => {
-    setName(text);
+  const nicknameHandler = text => {
+    setNickname(text);
   };
 
   const emailHandler = text => {
@@ -61,7 +66,7 @@ export default function RegistrationScreen({ navigation }) {
   };
 
   const resetForm = () => {
-    setName(INITIAL_STATE.name);
+    setNickname(INITIAL_STATE.nickname);
     setEmail(INITIAL_STATE.email);
     setPassword(INITIAL_STATE.password);
     setShowPassword(INITIAL_STATE.showPassword);
@@ -69,10 +74,11 @@ export default function RegistrationScreen({ navigation }) {
 
   const onSignup = () => {
     console.log('Signup credentials:');
-    console.log('name: ', name);
+    console.log('nickname: ', nickname);
     console.log('email: ', email);
     console.log('password: ', password);
     hideKeyboard();
+    dispatch(authSignUpUser({ nickname, email, password }));
     resetForm();
     setIsAuth(true);
   };
@@ -121,13 +127,13 @@ export default function RegistrationScreen({ navigation }) {
                 onSubmitEditing={onSignup}
                 style={{
                   ...styles.input,
-                  borderColor: focusedInput === 'name' ? '#ff6c00' : '#e8e8e8',
+                  borderColor: focusedInput === 'nickname' ? '#ff6c00' : '#e8e8e8',
                 }}
-                value={name}
-                onChangeText={nameHandler}
+                value={nickname}
+                onChangeText={nicknameHandler}
                 onFocus={() => {
                   setIsKeyboardHide(false);
-                  setFocusedInput('name');
+                  setFocusedInput('nickname');
                 }}
                 onBlur={() => setFocusedInput(null)}
               />

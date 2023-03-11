@@ -51,7 +51,7 @@ const UpperComponent = () => {
       <View style={styles.signoutButtonContainer}>
         <SignOutIcon onPress={signOut} />
       </View>
-      <Text style={styles.name}>{userData.name}</Text>
+      <Text style={styles.nickname}>{userData.nickname}</Text>
     </View>
   );
 };
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     top: 75,
     left: 101,
   },
-  name: {
+  nickname: {
     fontFamily: 'Roboto-Regular',
     fontWeight: '500',
     fontSize: 30,

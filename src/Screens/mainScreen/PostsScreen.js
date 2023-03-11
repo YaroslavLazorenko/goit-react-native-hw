@@ -77,7 +77,7 @@ export default function PostsScreen({ navigation, route }) {
           <Image style={styles.userPhoto} source={require('../../assets/images/user-photo.jpg')} />
         </View>
         <View style={styles.userDataContainer}>
-          <Text style={styles.name}>{userData.name}</Text>
+          <Text style={styles.nickname}>{userData.nickname}</Text>
           <Text style={styles.email}>{userData.email}</Text>
         </View>
       </View>
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingLeft: 8,
   },
-  name: {
+  nickname: {
     fontFamily: 'Roboto-Regular',
     fontWeight: '700',
     fontSize: 13,

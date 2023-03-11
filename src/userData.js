@@ -1,6 +1,6 @@
 export const userData = {
   id: '1234567890',
-  name: 'Natali Romanova',
+  nickname: 'Natali Romanova',
   email: 'email@example.com',
   posts: [
     {
