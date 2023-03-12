@@ -144,18 +144,21 @@ const PostListItem = ({ item, navigation }) => {
 };
 
 export default function ProfileScreen({ navigation }) {
-  const [posts, setPosts] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
 
-  const getAllPost = () => {
+  const { userId } = useSelector(state => state.auth);
+
+  const getUserPost = () => {
     db.firestore()
       .collection('posts')
+      .where('userId', '==', userId)
       .onSnapshot(data =>
-        setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+        setUserPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
       );
   };
 
   useEffect(() => {
-    getAllPost();
+    getUserPost();
   }, []);
 
   return (
@@ -164,18 +167,27 @@ export default function ProfileScreen({ navigation }) {
         style={styles.backgroundImage}
         source={require('../../assets/images/background-image.jpg')}
       >
-        <FlatList
-          data={posts}
-          keyExtractor={item => item.id}
-          renderItem={({ item, index }) => {
-            return (
-              <>
-                {index === 0 && <UpperComponent />}
-                <PostListItem item={item} navigation={navigation} />
-              </>
-            );
-          }}
-        />
+        {userPosts.length > 0 ? (
+          <FlatList
+            data={userPosts}
+            keyExtractor={item => item.id}
+            renderItem={({ item, index }) => {
+              return (
+                <>
+                  {index === 0 && <UpperComponent />}
+                  <PostListItem item={item} navigation={navigation} />
+                </>
+              );
+            }}
+          />
+        ) : (
+          <>
+            <UpperComponent />
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>No posts yet...</Text>
+            </View>
+          </>
+        )}
       </ImageBackground>
     </SafeAreaView>
   );
@@ -308,6 +320,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     textDecorationLine: 'underline',
+    color: '#212121',
+  },
+  labelContainer: {
+    flex: 1,
+    width: Dimensions.get('window').width,
+    backgroundColor: '#fff',
+  },
+  label: {
+    fontFamily: 'Roboto-Regular',
+    fontWeight: '500',
+    textAlign: 'center',
+    fontSize: 18,
     color: '#212121',
   },
 });

@@ -16,7 +16,7 @@ export const authSignUpUser =
       const { uid, displayName } = db.auth().currentUser;
 
       const userUpdateProfile = {
-        nickName: displayName,
+        nickname: displayName,
         userId: uid,
         email,
       };
