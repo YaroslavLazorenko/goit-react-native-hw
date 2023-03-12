@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   View,
   SafeAreaView,
@@ -11,6 +12,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
+import db from '../../firebase/config';
 
 import { authSignOutUser } from '../../redux/auth/authOperations';
 
@@ -20,10 +24,9 @@ import CommentsIcon from '../../assets/images/comments.svg';
 import ThumbsUpIcon from '../../assets/images/thumbs-up.svg';
 import LocationIcon from '../../assets/images/map-pin.svg';
 
-import { userData } from '../../userData';
-
 const UpperComponent = () => {
   const dispatch = useDispatch();
+  const { nickname } = useSelector(state => state.auth);
 
   const signOut = () => {
     dispatch(authSignOutUser());
@@ -57,19 +60,36 @@ const UpperComponent = () => {
       <View style={styles.signoutButtonContainer}>
         <SignOutIcon onPress={signOut} />
       </View>
-      <Text style={styles.nickname}>{userData.nickname}</Text>
+      <Text style={styles.nickname}>{nickname}</Text>
     </View>
   );
 };
 
 const PostListItem = ({ item, navigation }) => {
-  const { comments, photo, title, likesNumber, locationCountry } = item;
-  const commentsNumber = comments.length;
+  const [allComments, setAllComments] = useState([]);
+
+  const { id, photo, title, likesNumber, locationRegion } = item;
+
+  const getAllComments = async () => {
+    db.firestore()
+      .collection('posts')
+      .doc(id)
+      .collection('comments')
+      .onSnapshot(data =>
+        setAllComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+      );
+  };
+
+  useEffect(() => {
+    getAllComments();
+  }, []);
+
+  const commentsNumber = allComments.length;
 
   return (
     <View style={styles.postItemContainer}>
       <View style={styles.postPhotoContainer}>
-        <Image style={styles.postPhoto} source={photo} />
+        <Image style={styles.postPhoto} source={{ uri: photo }} />
       </View>
       <View>
         <Text style={styles.title}>{title}</Text>
@@ -79,7 +99,7 @@ const PostListItem = ({ item, navigation }) => {
               style={styles.postCommentsContainer}
               activeOpacity={0.6}
               onPress={() =>
-                navigation.navigate('Comments', { comments, photo })
+                navigation.navigate('Comments', { postId: id, photo })
               }
             >
               <CommentsIcon
@@ -115,7 +135,7 @@ const PostListItem = ({ item, navigation }) => {
             onPress={() => navigation.navigate('Map', item)}
           >
             <LocationIcon />
-            <Text style={styles.postLocation}>{locationCountry}</Text>
+            <Text style={styles.postLocation}>{locationRegion}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -124,6 +144,20 @@ const PostListItem = ({ item, navigation }) => {
 };
 
 export default function ProfileScreen({ navigation }) {
+  const [posts, setPosts] = useState([]);
+
+  const getAllPost = () => {
+    db.firestore()
+      .collection('posts')
+      .onSnapshot(data =>
+        setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+      );
+  };
+
+  useEffect(() => {
+    getAllPost();
+  }, []);
+
   return (
     <SafeAreaView style={styles.bgContainer}>
       <ImageBackground
@@ -131,7 +165,7 @@ export default function ProfileScreen({ navigation }) {
         source={require('../../assets/images/background-image.jpg')}
       >
         <FlatList
-          data={userData.posts}
+          data={posts}
           keyExtractor={item => item.id}
           renderItem={({ item, index }) => {
             return (
@@ -219,6 +253,8 @@ const styles = StyleSheet.create({
   },
   postPhoto: {
     flex: 1,
+    width: Dimensions.get('window').width * 0.91,
+    height: 240,
     resizeMode: 'cover',
   },
   title: {

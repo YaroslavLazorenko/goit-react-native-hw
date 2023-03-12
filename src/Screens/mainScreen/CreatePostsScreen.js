@@ -148,7 +148,6 @@ export default function CreatePostsScreen({ navigation }) {
         likesNumber: 0,
         locationRegion: locality,
         location: coords,
-        comments: [],
       };
 
       console.log(post);

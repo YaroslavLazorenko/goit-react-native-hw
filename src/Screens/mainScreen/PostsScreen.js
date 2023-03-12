@@ -17,8 +17,25 @@ import CommentsIcon from '../../assets/images/comments.svg';
 import LocationIcon from '../../assets/images/map-pin.svg';
 
 const PostListItem = ({ item, navigation }) => {
-  const { id, comments, photo, title, locationRegion, locationCountry } = item;
-  const commentsNumber = comments.length;
+  const [allComments, setAllComments] = useState([]);
+
+  const { id, photo, title, locationRegion, locationCountry } = item;
+
+  const getAllComments = async () => {
+    db.firestore()
+      .collection('posts')
+      .doc(id)
+      .collection('comments')
+      .onSnapshot(data =>
+        setAllComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+      );
+  };
+
+  useEffect(() => {
+    getAllComments();
+  }, []);
+
+  const commentsNumber = allComments.length;
 
   return (
     <View>
@@ -32,7 +49,7 @@ const PostListItem = ({ item, navigation }) => {
             style={styles.postCommentsContainer}
             activeOpacity={0.6}
             onPress={() =>
-              navigation.navigate('Comments', { postId: id, comments, photo })
+              navigation.navigate('Comments', { postId: id, photo })
             }
           >
             <CommentsIcon

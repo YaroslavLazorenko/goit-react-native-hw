@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   SafeAreaView,
@@ -13,10 +13,11 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import { useSelector } from 'react-redux';
+
+import db from '../../firebase/config';
 
 import SendCommentButtonIcon from '../../assets/images/send-comment.svg';
-
-import { userData } from '../../userData';
 
 const INITIAL_STATE = {
   comment: '',
@@ -24,17 +25,33 @@ const INITIAL_STATE = {
   focusedInput: false,
 };
 
+const months = [
+  'січня',
+  'лютого',
+  'березня',
+  'квітня',
+  'травня',
+  'червня',
+  'липня',
+  'серпня',
+  'вересня',
+  'жовтня',
+  'листопада',
+  'грудня',
+];
+
 const UpperComponent = ({ photo }) => {
   return (
     <View style={styles.postPhotoContainer}>
-      <Image style={styles.postPhoto} source={photo} />
+      <Image style={styles.postPhoto} source={{ uri: photo }} />
     </View>
   );
 };
 
 const CommentsListItem = ({ item }) => {
-  const { ownerId, ownerPhoto, date, text } = item;
-  const isOwner = ownerId === userData.id;
+  const { userId: ownerId, time, comment } = item;
+  const { userId } = useSelector(state => state.auth);
+  const isOwner = ownerId === userId;
 
   return (
     <View
@@ -44,7 +61,14 @@ const CommentsListItem = ({ item }) => {
       }}
     >
       <View style={styles.userPhotoContainer}>
-        <Image style={styles.userPhoto} source={ownerPhoto} />
+        <Image
+          style={styles.userPhoto}
+          source={
+            isOwner
+              ? require('../../assets/images/user-photo.jpg')
+              : require('../../assets/images/1234567890-photo.jpg')
+          }
+        />
       </View>
       <View
         style={{
@@ -55,8 +79,10 @@ const CommentsListItem = ({ item }) => {
           borderTopRightRadius: isOwner ? 0 : 6,
         }}
       >
-        <Text style={styles.text}>{text}</Text>
-        <Text style={{ ...styles.date, textAlign: isOwner ? 'left' : 'right' }}>{date}</Text>
+        <Text style={styles.text}>{comment}</Text>
+        <Text style={{ ...styles.time, textAlign: isOwner ? 'left' : 'right' }}>
+          {time}
+        </Text>
       </View>
     </View>
   );
@@ -64,11 +90,50 @@ const CommentsListItem = ({ item }) => {
 
 export default function CommentsScreen({ route }) {
   const [comment, setComment] = useState(INITIAL_STATE.comment);
-  const [isKeyboardHide, setIsKeyboardHide] = useState(INITIAL_STATE.isKeyboardHide);
+  const [allComments, setAllComments] = useState([]);
+  const [isKeyboardHide, setIsKeyboardHide] = useState(
+    INITIAL_STATE.isKeyboardHide,
+  );
   const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
 
-  const { comments, photo } = route.params;
-  const isCommentsExist = comments.length > 0;
+  const { userId } = useSelector(state => state.auth);
+
+  const { photo, postId } = route.params;
+  const isCommentsExist = allComments.length > 0;
+
+  const getDateTime = () => {
+    const date = new Date();
+
+    const mins = date.getMinutes();
+    const minutes = mins < 10 ? '0' + mins.toString() : mins.toString();
+
+    return `${date.getDate()} ${
+      months[date.getMonth() + 1]
+    }, ${date.getFullYear()} | ${date.getHours()}:${minutes}`;
+  };
+
+  const createComment = async () => {
+    await db
+      .firestore()
+      .collection('posts')
+      .doc(postId)
+      .collection('comments')
+      .add({ comment, userId, time: getDateTime() });
+  };
+
+  const getAllComments = async () => {
+    db.firestore()
+      .collection('posts')
+      .doc(postId)
+      .collection('comments')
+      .onSnapshot(data =>
+        setAllComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+      );
+  };
+
+  useEffect(() => {
+    getAllComments();
+  }, []);
 
   const hideKeyboard = () => {
     setIsKeyboardHide(true);
@@ -86,6 +151,7 @@ export default function CommentsScreen({ route }) {
   const onComment = () => {
     console.log('Comment:', comment);
     hideKeyboard();
+    createComment();
     resetForm();
   };
 
@@ -98,7 +164,7 @@ export default function CommentsScreen({ route }) {
         >
           {isKeyboardHide && isCommentsExist ? (
             <FlatList
-              data={comments}
+              data={allComments}
               renderItem={({ item, index }) => {
                 return (
                   <TouchableOpacity onPress={() => false} activeOpacity={1}>
@@ -138,7 +204,10 @@ export default function CommentsScreen({ route }) {
               }}
               onBlur={() => setFocusedInput(false)}
             />
-            <TouchableOpacity style={styles.sendCommentButton} onPress={onComment}>
+            <TouchableOpacity
+              style={styles.sendCommentButton}
+              onPress={onComment}
+            >
               <SendCommentButtonIcon />
             </TouchableOpacity>
           </View>
@@ -199,7 +268,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#212121',
   },
-  date: {
+  time: {
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     fontSize: 10,
