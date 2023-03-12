@@ -18,6 +18,9 @@ import {
 import * as Location from 'expo-location';
 import { Camera } from 'expo-camera';
 import { customAlphabet } from 'nanoid/non-secure';
+import { useSelector } from 'react-redux';
+
+import db from '../../firebase/config';
 
 import DownloadPhotoIcon from '../../assets/images/download-photo.svg';
 import EditPhotoIcon from '../../assets/images/edit-photo.svg';
@@ -55,6 +58,8 @@ export default function CreatePostsScreen({ navigation }) {
     INITIAL_STATE.isPhotoDownloaded,
   );
 
+  const { userId, nickname } = useSelector(state => state.auth);
+
   useEffect(() => {
     (async () => {
       let { status: geolocationStatus } =
@@ -91,22 +96,42 @@ export default function CreatePostsScreen({ navigation }) {
     takePhoto();
   };
 
-  const takePhoto = async () => {
-    const photo = await cameraRef.takePictureAsync();
-    setPhoto(photo.uri);
-    setIsPhotoDownloaded(true);
-  };
-
   const resetForm = () => {
     setTitle(INITIAL_STATE.title);
     setLocality(INITIAL_STATE.locality);
     setIsPhotoDownloaded(INITIAL_STATE.isPhotoDownloaded);
   };
 
+  const takePhoto = async () => {
+    const photo = await cameraRef.takePictureAsync();
+    setPhoto(photo.uri);
+    setIsPhotoDownloaded(true);
+  };
+
+  const uploadPhotoToServer = async () => {
+    const response = await fetch(photo);
+    const file = await response.blob();
+
+    const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
+    const uniquePostId = nanoid();
+
+    await db.storage().ref(`postImage/${uniquePostId}`).put(file);
+
+    const processedPhoto = await db
+      .storage()
+      .ref('postImage')
+      .child(uniquePostId)
+      .getDownloadURL();
+
+    return processedPhoto;
+  };
+
   const onPost = () => {
     hideKeyboard();
 
     (async () => {
+      const photoURL = await uploadPhotoToServer();
+
       let location = await Location.getCurrentPositionAsync({});
       const coords = {
         latitude: location.coords.latitude,
@@ -116,16 +141,22 @@ export default function CreatePostsScreen({ navigation }) {
       const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
       const post = {
         id: nanoid(),
+        userId,
+        nickname,
         title,
-        photo: { uri: photo },
+        photo: photoURL,
         likesNumber: 0,
         locationRegion: locality,
         location: coords,
         comments: [],
       };
 
+      console.log(post);
+
+      await db.firestore().collection('posts').add(post);
+
       resetForm();
-      navigation.navigate('Posts', post);
+      navigation.navigate('Posts');
     })();
   };
 

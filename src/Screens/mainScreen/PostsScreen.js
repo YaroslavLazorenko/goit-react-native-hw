@@ -9,20 +9,21 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import { useSelector } from 'react-redux';
+
+import db from '../../firebase/config';
 
 import CommentsIcon from '../../assets/images/comments.svg';
 import LocationIcon from '../../assets/images/map-pin.svg';
 
-import { userData } from '../../userData';
-
 const PostListItem = ({ item, navigation }) => {
-  const { comments, photo, title, locationRegion, locationCountry } = item;
+  const { id, comments, photo, title, locationRegion, locationCountry } = item;
   const commentsNumber = comments.length;
 
   return (
     <View>
       <View style={styles.postPhotoContainer}>
-        <Image style={styles.postPhoto} source={photo} />
+        <Image style={styles.postPhoto} source={{ uri: photo }} />
       </View>
       <View>
         <Text style={styles.title}>{title}</Text>
@@ -30,7 +31,9 @@ const PostListItem = ({ item, navigation }) => {
           <TouchableOpacity
             style={styles.postCommentsContainer}
             activeOpacity={0.6}
-            onPress={() => navigation.navigate('Comments', { comments, photo })}
+            onPress={() =>
+              navigation.navigate('Comments', { postId: id, comments, photo })
+            }
           >
             <CommentsIcon
               fill={commentsNumber === 0 ? '#fff' : '#ff6c00'}
@@ -52,7 +55,9 @@ const PostListItem = ({ item, navigation }) => {
           >
             <LocationIcon />
             <Text style={styles.postLocation}>
-              {locationCountry ? `${locationRegion}, ${locationCountry}` : locationRegion}
+              {locationCountry
+                ? `${locationRegion}, ${locationCountry}`
+                : locationRegion}
             </Text>
           </TouchableOpacity>
         </View>
@@ -61,29 +66,42 @@ const PostListItem = ({ item, navigation }) => {
   );
 };
 
-export default function PostsScreen({ navigation, route }) {
-  const [posts, setPosts] = useState(userData.posts);
+export default function PostsScreen({ navigation }) {
+  const [posts, setPosts] = useState([]);
+
+  const { email, nickname } = useSelector(state => state.auth);
+
+  const getAllPost = () => {
+    db.firestore()
+      .collection('posts')
+      .onSnapshot(data =>
+        setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+      );
+  };
 
   useEffect(() => {
-    if (route.params) {
-      setPosts(prevState => [...prevState, route.params]);
-    }
-  }, [route.params]);
+    getAllPost();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.userContainer}>
         <View style={styles.userPhotoContainer}>
-          <Image style={styles.userPhoto} source={require('../../assets/images/user-photo.jpg')} />
+          <Image
+            style={styles.userPhoto}
+            source={require('../../assets/images/user-photo.jpg')}
+          />
         </View>
         <View style={styles.userDataContainer}>
-          <Text style={styles.nickname}>{userData.nickname}</Text>
-          <Text style={styles.email}>{userData.email}</Text>
+          <Text style={styles.nickname}>{nickname}</Text>
+          <Text style={styles.email}>{email}</Text>
         </View>
       </View>
       <FlatList
         data={posts}
-        renderItem={({ item }) => <PostListItem item={item} navigation={navigation} />}
+        renderItem={({ item }) => (
+          <PostListItem item={item} navigation={navigation} />
+        )}
         keyExtractor={item => item.id}
       />
     </SafeAreaView>
