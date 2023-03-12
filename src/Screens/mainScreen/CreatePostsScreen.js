@@ -150,8 +150,6 @@ export default function CreatePostsScreen({ navigation }) {
         location: coords,
       };
 
-      console.log(post);
-
       await db.firestore().collection('posts').add(post);
 
       resetForm();
