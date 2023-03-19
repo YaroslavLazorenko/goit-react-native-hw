@@ -65,14 +65,20 @@ export default function CreatePostsScreen({ navigation }) {
       let { status: geolocationStatus } =
         await Location.requestForegroundPermissionsAsync();
       if (geolocationStatus !== 'granted') {
-        Alert.alert('Alert', 'Permission to access location was denied');
+        Alert.alert(
+          'Попередження!',
+          'У доступі до геолокації відмовлено. Ви маєте надати застосунку доступ до геолокації. В іншому разі ви зможете створити публікацію, але користувачі не побачать її локацію на карті.',
+        );
       }
       setHasGeolocationPermission(geolocationStatus === 'granted');
 
       let { status: cameraStatus } =
         await Camera.requestCameraPermissionsAsync();
       if (cameraStatus !== 'granted') {
-        Alert.alert('Alert', 'Permission to access camera was denied');
+        Alert.alert(
+          'Помилка!',
+          'У доступі до камери відмовлено. Ви повинні надати застосунку доступ до камери щоб мати можливість створити публікацію.',
+        );
       }
       setHasCameraPermission(cameraStatus === 'granted');
     })();
@@ -132,11 +138,15 @@ export default function CreatePostsScreen({ navigation }) {
     (async () => {
       const photoURL = await uploadPhotoToServer();
 
-      let location = await Location.getCurrentPositionAsync({});
-      const coords = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      };
+      let location = hasGeolocationPermission
+        ? await Location.getCurrentPositionAsync({})
+        : null;
+      const coords = hasGeolocationPermission
+        ? {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }
+        : null;
 
       const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
       const post = {
@@ -158,11 +168,7 @@ export default function CreatePostsScreen({ navigation }) {
   };
 
   const isPublishAllowed =
-    title &&
-    locality &&
-    hasCameraPermission &&
-    hasGeolocationPermission &&
-    isPhotoDownloaded;
+    title && locality && hasCameraPermission && isPhotoDownloaded;
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>

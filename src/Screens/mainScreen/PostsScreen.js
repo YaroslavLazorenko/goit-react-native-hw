@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 
@@ -19,7 +20,7 @@ import LocationIcon from '../../assets/images/map-pin.svg';
 const PostListItem = ({ item, navigation }) => {
   const [allComments, setAllComments] = useState([]);
 
-  const { id, photo, title, locationRegion, locationCountry } = item;
+  const { id, photo, title, locationRegion, locationCountry, location } = item;
 
   const getAllComments = async () => {
     db.firestore()
@@ -34,6 +35,15 @@ const PostListItem = ({ item, navigation }) => {
   useEffect(() => {
     getAllComments();
   }, []);
+
+  const onMap = () => {
+    if (!location)
+      return Alert.alert(
+        'Повідомлення',
+        'Автор не надав геолокацію для публікації',
+      );
+    navigation.navigate('Map', item);
+  };
 
   const commentsNumber = allComments.length;
 
@@ -68,7 +78,7 @@ const PostListItem = ({ item, navigation }) => {
           <TouchableOpacity
             style={styles.postLocationContainer}
             activeOpacity={0.6}
-            onPress={() => navigation.navigate('Map', item)}
+            onPress={onMap}
           >
             <LocationIcon />
             <Text style={styles.postLocation}>

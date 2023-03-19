@@ -68,7 +68,7 @@ const UpperComponent = () => {
 const PostListItem = ({ item, navigation }) => {
   const [allComments, setAllComments] = useState([]);
 
-  const { id, photo, title, likesNumber, locationRegion } = item;
+  const { id, photo, title, likesNumber, locationRegion, location } = item;
 
   const getAllComments = async () => {
     db.firestore()
@@ -83,6 +83,15 @@ const PostListItem = ({ item, navigation }) => {
   useEffect(() => {
     getAllComments();
   }, []);
+
+  const onMap = () => {
+    if (!location)
+      return Alert.alert(
+        'Повідомлення',
+        'Автор не надав геолокацію для публікації',
+      );
+    navigation.navigate('Map', item);
+  };
 
   const commentsNumber = allComments.length;
 
@@ -132,7 +141,7 @@ const PostListItem = ({ item, navigation }) => {
           <TouchableOpacity
             style={styles.postLocationContainer}
             activeOpacity={0.6}
-            onPress={() => navigation.navigate('Map', item)}
+            onPress={onMap}
           >
             <LocationIcon />
             <Text style={styles.postLocation}>{locationRegion}</Text>
