@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,12 +11,16 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
   Dimensions,
   Alert,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { authSignUpUser } from '../../redux/auth/authOperations';
+import {
+  authSignUpUser,
+  authResetStatus,
+} from '../../redux/auth/authOperations';
 
 import AddPhotoImage from '../../assets/images/add-photo.svg';
 
@@ -38,6 +42,8 @@ export default function RegistrationScreen({ navigation }) {
     INITIAL_STATE.isKeyboardHide,
   );
   const [focusedInput, setFocusedInput] = useState(INITIAL_STATE.focusedInput);
+
+  const { status, error } = useSelector(state => state.auth);
 
   const dispatch = useDispatch();
 
@@ -70,14 +76,37 @@ export default function RegistrationScreen({ navigation }) {
     setShowPassword(INITIAL_STATE.showPassword);
   };
 
+  const onErrorAlert = () => {
+    dispatch(authResetStatus());
+  };
+
+  useEffect(() => {
+    if (status === 'rejected')
+      Alert.alert(
+        'Помилка!',
+        `Не вдалось зареєструватись. Повідомлення про помилку: ${error}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              onErrorAlert();
+            },
+          },
+        ],
+      );
+    if (status === 'fulfilled') {
+      resetForm();
+    }
+  }, [status, error]);
+
   const onSignup = () => {
     console.log('Signup credentials:');
     console.log('nickname: ', nickname);
     console.log('email: ', email);
     console.log('password: ', password);
+
     hideKeyboard();
     dispatch(authSignUpUser({ nickname, email, password }));
-    resetForm();
   };
 
   return (
@@ -191,10 +220,21 @@ export default function RegistrationScreen({ navigation }) {
                 <>
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    style={styles.button}
+                    style={{
+                      ...styles.button,
+                      backgroundColor:
+                        status === 'idle' ? '#ff6c00' : '#ff6c00cc',
+                    }}
+                    disabled={status !== 'idle'}
                     onPress={onSignup}
                   >
-                    <Text style={styles.buttonTitle}>Зареєструватись</Text>
+                    {status === 'pending' ? (
+                      <ActivityIndicator size="large" color="#0f0" />
+                    ) : (
+                      <Text style={styles.buttonTitle}>
+                        {status === 'idle' && 'Зареєструватись'}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   <TouchableOpacity
                     activeOpacity={0.6}

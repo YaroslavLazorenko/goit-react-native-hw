@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,12 +9,17 @@ import {
   ImageBackground,
   Platform,
   Dimensions,
+  ActivityIndicator,
+  Alert,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { authSignInUser } from '../../redux/auth/authOperations';
+import {
+  authSignInUser,
+  authResetStatus,
+} from '../../redux/auth/authOperations';
 
 const INITIAL_STATE = {
   email: '',
@@ -31,6 +36,8 @@ export default function LoginScreen({ navigation }) {
     INITIAL_STATE.isKeyboardHide,
   );
   const [focusedInput, setFocusedInput] = useState(null);
+
+  const { status, error } = useSelector(state => state.auth);
 
   const dispatch = useDispatch();
 
@@ -58,13 +65,36 @@ export default function LoginScreen({ navigation }) {
     setShowPassword(INITIAL_STATE.showPassword);
   };
 
+  const onErrorAlert = () => {
+    dispatch(authResetStatus());
+  };
+
+  useEffect(() => {
+    if (status === 'rejected')
+      Alert.alert(
+        'Помилка!',
+        `Не вдалось увійти в обліковий запис. Повідомлення про помилку: ${error}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              onErrorAlert();
+            },
+          },
+        ],
+      );
+    if (status === 'fulfilled') {
+      resetForm();
+    }
+  }, [status, error]);
+
   const onLogin = () => {
     console.log('Login credentials:');
     console.log('email: ', email);
     console.log('password: ', password);
+
     hideKeyboard();
     dispatch(authSignInUser({ email, password }));
-    resetForm();
   };
 
   return (
@@ -138,10 +168,21 @@ export default function LoginScreen({ navigation }) {
                 <>
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    style={styles.button}
+                    style={{
+                      ...styles.button,
+                      backgroundColor:
+                        status === 'idle' ? '#ff6c00' : '#ff6c00cc',
+                    }}
+                    disabled={status !== 'idle'}
                     onPress={onLogin}
                   >
-                    <Text style={styles.buttonTitle}>Увійти</Text>
+                    {status === 'pending' ? (
+                      <ActivityIndicator size="large" color="#0f0" />
+                    ) : (
+                      <Text style={styles.buttonTitle}>
+                        {status === 'idle' && 'Увійти'}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   <TouchableOpacity
                     activeOpacity={0.6}

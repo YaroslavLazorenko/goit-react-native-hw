@@ -1,12 +1,20 @@
 import db from '../../firebase/config';
 import { authSlice } from './authReducer';
 
-const { updateUserProfile, authSignOut, authStateChange } = authSlice.actions;
+const {
+  updateUserProfile,
+  authSignOut,
+  authStateChange,
+  updateAuthStatus,
+  updateAuthError,
+} = authSlice.actions;
 
 export const authSignUpUser =
   ({ nickname, email, password }) =>
   async (dispatch, getState) => {
     try {
+      dispatch(updateAuthStatus({ status: 'pending' }));
+
       await db.auth().createUserWithEmailAndPassword(email, password);
 
       const user = db.auth().currentUser;
@@ -21,10 +29,22 @@ export const authSignUpUser =
         email,
       };
 
+      dispatch(updateAuthStatus({ status: 'fulfilled' }));
       dispatch(updateUserProfile(userUpdateProfile));
     } catch (error) {
       console.log('error', error);
       console.log('error.message', error.message);
+
+      dispatch(
+        updateAuthStatus({
+          status: 'rejected',
+        }),
+      );
+      dispatch(
+        updateAuthError({
+          error: error.message,
+        }),
+      );
     }
   };
 
@@ -32,10 +52,25 @@ export const authSignInUser =
   ({ email, password }) =>
   async (dispatch, getState) => {
     try {
+      dispatch(updateAuthStatus({ status: 'pending' }));
+
       await db.auth().signInWithEmailAndPassword(email, password);
+
+      dispatch(updateAuthStatus({ status: 'fulfilled' }));
     } catch (error) {
       console.log('error', error);
       console.log('error.message', error.message);
+
+      dispatch(
+        updateAuthStatus({
+          status: 'rejected',
+        }),
+      );
+      dispatch(
+        updateAuthError({
+          error: error.message,
+        }),
+      );
     }
   };
 
@@ -57,4 +92,17 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
       dispatch(updateUserProfile(userUpdateProfile));
     }
   });
+};
+
+export const authResetStatus = () => async (dispatch, getState) => {
+  dispatch(
+    updateAuthStatus({
+      status: 'idle',
+    }),
+  );
+  dispatch(
+    updateAuthError({
+      error: null,
+    }),
+  );
 };

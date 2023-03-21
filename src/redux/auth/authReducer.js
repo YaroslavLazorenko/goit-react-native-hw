@@ -5,6 +5,8 @@ const state = {
   nickname: null,
   email: null,
   stateChange: false,
+  status: 'idle',
+  error: null,
 };
 
 export const authSlice = createSlice({
@@ -22,5 +24,13 @@ export const authSlice = createSlice({
       stateChange: payload.stateChange,
     }),
     authSignOut: () => state,
+    updateAuthStatus: (state, { payload }) => ({
+      ...state,
+      status: payload.status,
+    }),
+    updateAuthError: (state, { payload }) => ({
+      ...state,
+      error: payload.error,
+    }),
   },
 });
