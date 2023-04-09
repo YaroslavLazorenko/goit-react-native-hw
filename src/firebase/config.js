@@ -3,13 +3,22 @@ import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 import 'firebase/compat/firestore';
 
+import {
+  API_KEY,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGING_SENDER_ID,
+  APP_ID,
+} from '@env';
+
 const firebaseConfig = {
-  apiKey: 'AIzaSyCIzd2VRu4KqUVMi_QiNOiAHeDRH-r1pw8',
-  authDomain: 'rn-social1.firebaseapp.com',
-  projectId: 'rn-social1',
-  storageBucket: 'rn-social1.appspot.com',
-  messagingSenderId: '818198319248',
-  appId: '1:818198319248:web:6ee7a084d013f816098815',
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGING_SENDER_ID,
+  appId: APP_ID,
 };
 
 firebase.initializeApp(firebaseConfig);
