@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
+  ActivityIndicator,
   Platform,
   Image,
   Text,
@@ -18,13 +19,15 @@ import {
 import * as Location from 'expo-location';
 import { Camera } from 'expo-camera';
 import { customAlphabet } from 'nanoid/non-secure';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import db from '../../firebase/config';
 
 import DownloadPhotoIcon from '../../assets/images/download-photo.svg';
 import EditPhotoIcon from '../../assets/images/edit-photo.svg';
 import LocationIcon from '../../assets/images/map-pin.svg';
+
+import { dashboardResetStatus } from '../../redux/dashboard/dashboardOperations';
 
 const INITIAL_STATE = {
   title: '',
@@ -59,6 +62,9 @@ export default function CreatePostsScreen({ navigation }) {
   );
 
   const { userId, nickname } = useSelector(state => state.auth);
+  const { status, error } = useSelector(state => state.dashboard);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
@@ -136,36 +142,82 @@ export default function CreatePostsScreen({ navigation }) {
     hideKeyboard();
 
     (async () => {
-      const photoURL = await uploadPhotoToServer();
+      try {
+        dispatch(updateDashboardStatus({ status: 'pending' }));
 
-      let location = hasGeolocationPermission
-        ? await Location.getCurrentPositionAsync({})
-        : null;
-      const coords = hasGeolocationPermission
-        ? {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }
-        : null;
+        const photoURL = await uploadPhotoToServer();
 
-      const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
-      const post = {
-        id: nanoid(),
-        userId,
-        nickname,
-        title,
-        photo: photoURL,
-        likesNumber: 0,
-        locationRegion: locality,
-        location: coords,
-      };
+        let location = hasGeolocationPermission
+          ? await Location.getCurrentPositionAsync({})
+          : null;
+        const coords = hasGeolocationPermission
+          ? {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }
+          : null;
 
-      await db.firestore().collection('posts').add(post);
+        const nanoid = customAlphabet(
+          'abcdefghijklmnopqrstuvwxyz0123456789',
+          10,
+        );
+        const post = {
+          id: nanoid(),
+          userId,
+          nickname,
+          title,
+          photo: photoURL,
+          likesNumber: 0,
+          locationRegion: locality,
+          location: coords,
+        };
 
-      resetForm();
-      navigation.navigate('Posts');
+        await db.firestore().collection('posts').add(post);
+
+        resetForm();
+        updateDashboardStatus({ status: 'fulfilled' });
+        navigation.navigate('Posts');
+      } catch (error) {
+        console.log('error', error);
+        console.log('error.message', error.message);
+
+        dispatch(
+          updateDashboardStatus({
+            status: 'rejected',
+          }),
+        );
+        dispatch(
+          updateDashboardError({
+            error: error.message,
+          }),
+        );
+      }
     })();
   };
+
+  const onErrorAlert = () => {
+    dispatch(dashboardResetStatus());
+  };
+
+  useEffect(() => {
+    if (status === 'rejected')
+      Alert.alert(
+        'Помилка!',
+        `Не вдалось створити публікацію. Повідомлення про помилку: ${error}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              onErrorAlert();
+            },
+          },
+        ],
+      );
+    if (status === 'fulfilled') {
+      resetForm();
+      updateDashboardStatus({ status: 'idle' });
+    }
+  }, [status, error]);
 
   const isPublishAllowed =
     title && locality && hasCameraPermission && isPhotoDownloaded;
@@ -279,19 +331,26 @@ export default function CreatePostsScreen({ navigation }) {
                 activeOpacity={0.8}
                 style={{
                   ...styles.button,
-                  backgroundColor: isPublishAllowed ? '#ff6c00' : '#f6f6f6',
+                  backgroundColor:
+                    isPublishAllowed || status !== 'idle'
+                      ? '#ff6c00'
+                      : '#f6f6f6',
                 }}
-                disabled={!isPublishAllowed}
+                disabled={!isPublishAllowed || status !== 'idle'}
                 onPress={onPost}
               >
-                <Text
-                  style={{
-                    ...styles.buttonTitle,
-                    color: isPublishAllowed ? '#fff' : '#bdbdbd',
-                  }}
-                >
-                  Опублікувати
-                </Text>
+                {status === 'pending' ? (
+                  <ActivityIndicator size="large" color="#0f0" />
+                ) : (
+                  <Text
+                    style={{
+                      ...styles.buttonTitle,
+                      color: isPublishAllowed ? '#fff' : '#bdbdbd',
+                    }}
+                  >
+                    {status === 'idle' && 'Опублікувати'}
+                  </Text>
+                )}
               </TouchableOpacity>
             ) : null}
           </KeyboardAvoidingView>

@@ -85,6 +85,7 @@ export default function LoginScreen({ navigation }) {
       );
     if (status === 'fulfilled') {
       resetForm();
+      updateDashboardStatus({ status: 'idle' });
     }
   }, [status, error]);
 
